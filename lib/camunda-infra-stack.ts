@@ -13,6 +13,7 @@ export class CamundaInfraStack extends cdk.Stack {
     const vpc = new ec2.Vpc(this, 'camundaVPC', {
       cidr: buildConfig.Cidr,
       enableDnsSupport: true,
+      enableDnsHostnames: true,
       maxAzs: 2,
       subnetConfiguration: [
         {
@@ -80,7 +81,7 @@ export class CamundaInfraStack extends cdk.Stack {
         DB_DRIVER: "org.postgresql.Driver",
         DB_USERNAME: buildConfig.DbUser,
         DB_PASSWORD: buildConfig.DbPass,
-        DB_URL: rdsInstance.instanceEndpoint.socketAddress
+        DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress
       }
     });
 
