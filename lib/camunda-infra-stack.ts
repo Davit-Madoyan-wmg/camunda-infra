@@ -117,7 +117,7 @@ export class CamundaInfraStack extends cdk.Stack {
     });
 
     // Create ASG
-    const scaling = service.autoScaleTaskCount({ maxCapacity: 10 });
+    const scaling = service.autoScaleTaskCount({ maxCapacity: 10, minCapacity: 1 });
     scaling.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 50
     });
