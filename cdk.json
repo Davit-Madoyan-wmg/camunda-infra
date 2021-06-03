@@ -1,0 +1,43 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/camunda-infra.ts",
+  "context": {
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/core:enableStackNameDuplicates": "true",
+    "aws-cdk:enableDiffNoFail": "true",
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "@aws-cdk/aws-ecr-assets:dockerIgnoreSupport": true,
+    "@aws-cdk/aws-secretsmanager:parseOwnedSecretName": true,
+    "@aws-cdk/aws-kms:defaultKeyPolicies": true,
+    "@aws-cdk/aws-s3:grantWriteWithoutAcl": true,
+    "@aws-cdk/aws-ecs-patterns:removeDefaultDesiredCount": true,
+    "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
+    "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
+
+    "dev": {
+      "AWSProfileRegion" : "us-east-1",
+
+      "App": "camunda",
+      "Environment": "dev",
+      "Cidr": "10.11.0.0/16",
+
+      "DbInstClass": "t3",
+      "DbInstType": "small",
+      "DbName": "camunda_db",
+      "DbUser": "camunda",
+      "DbPass": "password"
+    },
+    "prod": {
+      "AWSProfileRegion" : "us-east-2",
+
+      "App": "camunda",
+      "Environment": "prod",
+      "Cidr": "10.12.0.0/16",
+
+      "DbInstClass": "t3",
+      "DbInstType": "small",
+      "DbName": "camunda_db",
+      "DbUser": "camunda",
+      "DbPass": "password"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+name: Lambda API CICD Workflow
+# This workflow is triggered on pushes to the repository branch master, develop.
+on: push
+
+# Initializes environment variables for the workflow
+env:
+  REGION: us-east-1 # Deployment Region
+
+jobs:
+  master:
+    name: Deploy to prod
+    if: github.ref == 'refs/heads/master'
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code from git repo branch configured above, under folder $GITHUB_WORKSPACE.
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+      # Installs CDK and other prerequisites
+      - name: Prerequisite Installation
+        run: |
+          npm install typescript
+          sudo npm install -g aws-cdk
+      # Deploy CDK application
+      - name: Deploy to prod
+        run: |
+          cdk deploy -c config=prod
+  develop:
+    name: Deploy to dev
+    if: github.ref == 'refs/heads/develop'
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code from git repo branch configured above, under folder $GITHUB_WORKSPACE.
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+      # Installs CDK and other prerequisites
+      - name: Prerequisite Installation
+        run: |
+          npm install typescript
+          sudo npm install -g aws-cdk
+      # Deploy CDK application
+      - name: Deploy to dev
+        run: |
+          cdk deploy -c config=dev
