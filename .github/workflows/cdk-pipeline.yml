@@ -16,6 +16,9 @@ jobs:
       # Checkout code from git repo branch configured above, under folder $GITHUB_WORKSPACE.
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -25,12 +28,17 @@ jobs:
       # Installs CDK and other prerequisites
       - name: Prerequisite Installation
         run: |
-          npm install typescript
-          sudo npm install -g aws-cdk
+          npm install
+      - name: CDK synth
+        run: |
+          npx cdk synth -c config=prod
+      - name: CDK diff
+        run: |
+          npx cdk diff -c config=prod
       # Deploy CDK application
       - name: Deploy to prod
         run: |
-          cdk deploy -c config=prod --require-approval never
+          npx cdk deploy -c config=prod --require-approval never
   develop:
     name: Deploy to dev
     if: github.ref == 'refs/heads/develop'
@@ -40,6 +48,9 @@ jobs:
       # Checkout code from git repo branch configured above, under folder $GITHUB_WORKSPACE.
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -49,9 +60,14 @@ jobs:
       # Installs CDK and other prerequisites
       - name: Prerequisite Installation
         run: |
-          npm install typescript
-          sudo npm install -g aws-cdk
+          npm install
+      - name: CDK synth
+        run: |
+          npx cdk synth -c config=dev
+      - name: CDK diff
+        run: |
+          npx cdk diff -c config=dev
       # Deploy CDK application
       - name: Deploy to dev
         run: |
-          cdk deploy -c config=dev --require-approval never
+          npx cdk deploy -c config=dev --require-approval never
