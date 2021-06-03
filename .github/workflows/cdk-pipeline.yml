@@ -30,7 +30,7 @@ jobs:
       # Deploy CDK application
       - name: Deploy to prod
         run: |
-          cdk deploy -c config=prod
+          cdk deploy -c config=prod --require-approval never
   develop:
     name: Deploy to dev
     if: github.ref == 'refs/heads/develop'
@@ -54,4 +54,4 @@ jobs:
       # Deploy CDK application
       - name: Deploy to dev
         run: |
-          cdk deploy -c config=dev
+          cdk deploy -c config=dev --require-approval never
