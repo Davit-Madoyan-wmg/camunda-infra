@@ -58,8 +58,9 @@ export class CamundaInfraStack extends cdk.Stack {
       engine: rds.DatabaseInstanceEngine.postgres({version: rds.PostgresEngineVersion.VER_12_5}),
       instanceType: new ec2.InstanceType(`${buildConfig.DbInstClass}.${buildConfig.DbInstType}`),
       vpc: vpc,
-      vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
+      vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       databaseName: buildConfig.DbName,
+      // credentials: rds.Credentials.fromGeneratedSecret(buildConfig.DbUser),
       credentials: rds.Credentials.fromUsername(buildConfig.DbUser, {secretName: buildConfig.DbPass}),
       securityGroups: [postgresSG]
     })
@@ -81,7 +82,7 @@ export class CamundaInfraStack extends cdk.Stack {
         DB_DRIVER: "org.postgresql.Driver",
         DB_USERNAME: buildConfig.DbUser,
         DB_PASSWORD: buildConfig.DbPass,
-        DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress
+        DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress+"/"+buildConfig.DbName
       }
     });
 
@@ -106,6 +107,7 @@ export class CamundaInfraStack extends cdk.Stack {
       cluster: cluster,
       taskDefinition: fargateTaskDefinition,
       desiredCount: 1,
+      vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       securityGroups: [postgresSGAccess, ServiceSG]
     });
 

@@ -22,9 +22,9 @@
 
       "DbInstClass": "t3",
       "DbInstType": "small",
-      "DbName": "camunda_db",
+      "DbName": "processengine",
       "DbUser": "camunda",
-      "DbPass": "password"
+      "DbPass": "834a2b4baf03fd"
     },
     "prod": {
       "AWSProfileRegion" : "us-east-2",
