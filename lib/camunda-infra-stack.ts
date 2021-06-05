@@ -3,9 +3,7 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as rds from '@aws-cdk/aws-rds';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
 import {BuildConfig} from "../config/build-config";
-import { Secret } from '@aws-cdk/aws-ecs';
 
 
 export class CamundaInfraStack extends cdk.Stack {

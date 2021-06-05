@@ -34,7 +34,7 @@ function getConfig() {
   return buildConfig;
 }
 
-async function Main() {
+function Main() {
   let buildConfig: BuildConfig = getConfig();
 
   Tags.of(app).add('App', buildConfig.App);
