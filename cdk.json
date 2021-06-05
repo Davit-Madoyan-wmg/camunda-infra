@@ -16,6 +16,7 @@
     "dev": {
       "AWSProfileRegion" : "us-east-1",
 
+      "Project": "carpathia",
       "App": "camunda",
       "Environment": "dev",
       "Cidr": "10.11.0.0/16",
@@ -28,6 +29,7 @@
     "prod": {
       "AWSProfileRegion" : "us-east-2",
 
+      "Project": "carpathia",
       "App": "camunda",
       "Environment": "prod",
       "Cidr": "10.12.0.0/16",

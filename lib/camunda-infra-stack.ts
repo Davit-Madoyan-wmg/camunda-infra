@@ -4,6 +4,7 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as rds from '@aws-cdk/aws-rds';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import {BuildConfig} from "../config/build-config";
+import {Tags} from "@aws-cdk/core";
 
 
 export class CamundaInfraStack extends cdk.Stack {
@@ -39,6 +40,7 @@ export class CamundaInfraStack extends cdk.Stack {
     const cluster = new ecs.Cluster(this, 'camundaCluster', {
       vpc: vpc,
     })
+    Tags.of(cluster).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-cluster`)
 
     // Create SG for RDS
     const postgresSGAccess = new ec2.SecurityGroup(this, `rds-security-group-access`, {
@@ -46,6 +48,7 @@ export class CamundaInfraStack extends cdk.Stack {
       allowAllOutbound: true,
       description: 'SG to access Postgres'
     });
+    Tags.of(postgresSGAccess).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-sgAccess`)
 
     const postgresSG = new ec2.SecurityGroup(this, `rds-security-group`, {
       vpc: vpc,
@@ -53,10 +56,13 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG to attach to Postgres'
     });
     postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
+    Tags.of(postgresSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-sg`)
 
     const secret = new rds.DatabaseSecret(this, 'Secret', {
       username: buildConfig.DbUser
     });
+    Tags.of(secret).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-dbsecret`)
+
 
     // Create an RDS instance
     const rdsInstance = new rds.DatabaseInstance(this, 'CamundaInstance', {
@@ -68,12 +74,14 @@ export class CamundaInfraStack extends cdk.Stack {
       credentials: rds.Credentials.fromSecret(secret),
       securityGroups: [postgresSG]
     })
+    Tags.of(rdsInstance).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds`)
 
     // Create a task definition
     const fargateTaskDefinition = new ecs.FargateTaskDefinition(this, 'camundaTaskDef', {
       memoryLimitMiB: 512,
       cpu: 256
     });
+    Tags.of(fargateTaskDefinition).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-fargatetaskdefinition`)
 
     // Add params to task definition
     fargateTaskDefinition.addContainer("camunda", {
@@ -99,6 +107,7 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG for ALB'
     });
     AlbSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80), 'HTTP ingress from anywhere');
+    Tags.of(AlbSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-alb`)
 
     // Create SG for Service
     const ServiceSG = new ec2.SecurityGroup(this, `Alb-security-group-access`, {
@@ -107,6 +116,7 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG for camunda service'
     });
     ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(8080), 'Ingress from ALB sg');
+    Tags.of(ServiceSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-serviceSG`)
 
     // Create service
     const service = new ecs.FargateService(this, 'camundaService', {
@@ -116,6 +126,7 @@ export class CamundaInfraStack extends cdk.Stack {
       vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       securityGroups: [postgresSGAccess, ServiceSG]
     });
+    Tags.of(service).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-service`)
 
     // Create ALB
     const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', { vpc, internetFacing: true, securityGroup: AlbSG });
@@ -131,12 +142,16 @@ export class CamundaInfraStack extends cdk.Stack {
         healthyHttpCodes: '200-399'
       }
     });
+    Tags.of(lb).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-lb`)
+    Tags.of(listener).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-listener`)
+    Tags.of(targetGroup).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-targetgroup`)
 
     // Create ASG
     const scaling = service.autoScaleTaskCount({ maxCapacity: 10, minCapacity: 1 });
     scaling.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 50
     });
+    Tags.of(scaling).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-asg`)
 
   }
 }

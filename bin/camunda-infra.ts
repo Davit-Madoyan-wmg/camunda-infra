@@ -22,6 +22,7 @@ function getConfig() {
 
   let buildConfig: BuildConfig = {
       AWSProfileRegion: ensureString(unparsedEnv, 'AWSProfileRegion'),
+      Project: ensureString(unparsedEnv, 'Project'),
       App: ensureString(unparsedEnv, 'App'),
       Environment: ensureString(unparsedEnv, 'Environment'),
       Cidr: ensureString(unparsedEnv, 'Cidr'),
