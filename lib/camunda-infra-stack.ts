@@ -3,7 +3,9 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as rds from '@aws-cdk/aws-rds';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
+import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
 import {BuildConfig} from "../config/build-config";
+import { Secret } from '@aws-cdk/aws-ecs';
 
 
 export class CamundaInfraStack extends cdk.Stack {
@@ -13,6 +15,7 @@ export class CamundaInfraStack extends cdk.Stack {
     const vpc = new ec2.Vpc(this, 'camundaVPC', {
       cidr: buildConfig.Cidr,
       enableDnsSupport: true,
+      natGateways: 1,
       enableDnsHostnames: true,
       maxAzs: 2,
       subnetConfiguration: [
@@ -53,14 +56,18 @@ export class CamundaInfraStack extends cdk.Stack {
     });
     postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
 
+    const secret = new rds.DatabaseSecret(this, 'Secret', {
+      username: buildConfig.DbUser
+    });
+
     // Create an RDS instance
     const rdsInstance = new rds.DatabaseInstance(this, 'CamundaInstance', {
       engine: rds.DatabaseInstanceEngine.postgres({version: rds.PostgresEngineVersion.VER_12_5}),
       instanceType: new ec2.InstanceType(`${buildConfig.DbInstClass}.${buildConfig.DbInstType}`),
       vpc: vpc,
-      vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
+      vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       databaseName: buildConfig.DbName,
-      credentials: rds.Credentials.fromUsername(buildConfig.DbUser, {secretName: buildConfig.DbPass}),
+      credentials: rds.Credentials.fromSecret(secret),
       securityGroups: [postgresSG]
     })
 
@@ -79,9 +86,11 @@ export class CamundaInfraStack extends cdk.Stack {
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'camunda' }),
       environment: {
         DB_DRIVER: "org.postgresql.Driver",
-        DB_USERNAME: buildConfig.DbUser,
-        DB_PASSWORD: buildConfig.DbPass,
-        DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress
+        DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress+"/"+buildConfig.DbName
+      },
+      secrets: {
+        DB_PASSWORD: ecs.Secret.fromSecretsManager(rdsInstance.secret!, 'password'),
+        DB_USERNAME: ecs.Secret.fromSecretsManager(rdsInstance.secret!, 'username'),
       }
     });
 
@@ -99,13 +108,14 @@ export class CamundaInfraStack extends cdk.Stack {
       allowAllOutbound: true,
       description: 'SG for camunda service'
     });
-    ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(80), 'Ingress from ALB sg');
+    ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(8080), 'Ingress from ALB sg');
 
     // Create service
     const service = new ecs.FargateService(this, 'camundaService', {
       cluster: cluster,
       taskDefinition: fargateTaskDefinition,
       desiredCount: 1,
+      vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       securityGroups: [postgresSGAccess, ServiceSG]
     });
 
@@ -114,7 +124,14 @@ export class CamundaInfraStack extends cdk.Stack {
     const listener = lb.addListener('Listener', { port: 80 });
     const targetGroup = listener.addTargets('ECS', {
       port: 8080,
-      targets: [service]
+      targets: [service],
+      healthCheck: {
+        path: '/',
+        interval: cdk.Duration.minutes(1),
+        healthyThresholdCount: 7,
+        unhealthyThresholdCount: 7,
+        healthyHttpCodes: '200-399'
+      }
     });
 
     // Create ASG
