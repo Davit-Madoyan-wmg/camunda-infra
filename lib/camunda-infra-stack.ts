@@ -55,14 +55,6 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG to attach to Postgres'
     });
     postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
-    // postgresSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(5432), 'Ingress postgres from anywhere');
-
-    // // Default secret
-    // const secret = new secretsmanager.Secret(this, 'Secret');
-    // secret.grantRead;
-    // let ppp = new secretsmanager.Secret(this, 'secret', {
-    //   encryptionKey: de
-    // })
 
     const secret = new rds.DatabaseSecret(this, 'Secret', {
       username: buildConfig.DbUser
@@ -76,8 +68,6 @@ export class CamundaInfraStack extends cdk.Stack {
       vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       databaseName: buildConfig.DbName,
       credentials: rds.Credentials.fromSecret(secret),
-      // credentials: rds.Credentials.fromUsername(buildConfig.DbUser, {secretName: buildConfig.DbPass}),
-      // credentials: rds.Credentials.fromPassword(buildConfig.DbUser, secret.secretValue),
       securityGroups: [postgresSG]
     })
 
@@ -86,8 +76,6 @@ export class CamundaInfraStack extends cdk.Stack {
       memoryLimitMiB: 512,
       cpu: 256
     });
-
-    // console.log(secret.secretValue.toString())
 
     // Add params to task definition
     fargateTaskDefinition.addContainer("camunda", {
@@ -98,8 +86,6 @@ export class CamundaInfraStack extends cdk.Stack {
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'camunda' }),
       environment: {
         DB_DRIVER: "org.postgresql.Driver",
-        // DB_USERNAME: buildConfig.DbUser,
-        // DB_PASSWORD: secret.secretValue.toString(),
         DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress+"/"+buildConfig.DbName
       },
       secrets: {
@@ -123,7 +109,6 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG for camunda service'
     });
     ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(8080), 'Ingress from ALB sg');
-    // ServiceSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(8080), 'HTTP ingress from anywhere');
 
     // Create service
     const service = new ecs.FargateService(this, 'camundaService', {
@@ -131,7 +116,6 @@ export class CamundaInfraStack extends cdk.Stack {
       taskDefinition: fargateTaskDefinition,
       desiredCount: 1,
       vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
-      // securityGroups: [ServiceSG]
       securityGroups: [postgresSGAccess, ServiceSG]
     });
 
