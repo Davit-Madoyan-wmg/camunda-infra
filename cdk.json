@@ -23,8 +23,7 @@
       "DbInstClass": "t3",
       "DbInstType": "small",
       "DbName": "processengine",
-      "DbUser": "camunda",
-      "DbPass": "834a2b4baf03fd"
+      "DbUser": "camunda"
     },
     "prod": {
       "AWSProfileRegion" : "us-east-2",
@@ -36,8 +35,7 @@
       "DbInstClass": "t3",
       "DbInstType": "small",
       "DbName": "camunda_db",
-      "DbUser": "camunda",
-      "DbPass": "password"
+      "DbUser": "camunda"
     }
   }
 }

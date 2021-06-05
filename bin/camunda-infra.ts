@@ -27,7 +27,6 @@ function getConfig() {
       Cidr: ensureString(unparsedEnv, 'Cidr'),
       DbName: ensureString(unparsedEnv, 'DbName'),
       DbUser: ensureString(unparsedEnv, 'DbUser'),
-      DbPass: ensureString(unparsedEnv, 'DbPass'),
       DbInstType: ensureString(unparsedEnv, 'DbInstType'),
       DbInstClass: ensureString(unparsedEnv, 'DbInstClass')
   };
@@ -38,7 +37,7 @@ function getConfig() {
 async function Main() {
   let buildConfig: BuildConfig = getConfig();
 
-  Tags.of(app).add('Name', buildConfig.App);
+  Tags.of(app).add('App', buildConfig.App);
   Tags.of(app).add('Environment', buildConfig.Environment);
 
   let mainStackName = buildConfig.App + "-" + buildConfig.Environment + "-main";
