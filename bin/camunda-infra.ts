@@ -3,6 +3,7 @@ import {Tags} from '@aws-cdk/core';
 import cdk = require('@aws-cdk/core');
 import {CamundaInfraStack} from '../lib/camunda-infra-stack';
 import {BuildConfig} from "../config/build-config";
+import * as rds from "@aws-cdk/aws-rds";
 
 const app = new cdk.App();
 
@@ -20,40 +21,43 @@ function getConfig() {
 
   let unparsedEnv = app.node.tryGetContext(env);
 
-  let buildConfig: BuildConfig = {
+  const buildConfig: BuildConfig = {
       AWSProfileRegion: ensureString(unparsedEnv, 'AWSProfileRegion'),
       Project: ensureString(unparsedEnv, 'Project'),
       App: ensureString(unparsedEnv, 'App'),
       Environment: ensureString(unparsedEnv, 'Environment'),
-      Cidr: ensureString(unparsedEnv, 'Cidr'),
-      enableDnsSupport: ensureString(unparsedEnv, 'enableDnsSupport') || "true",
-      natGateways: ensureString(unparsedEnv, 'natGateways') || "1",
-      enableDnsHostnames: ensureString(unparsedEnv, 'enableDnsHostnames') || "true",
-      maxAzs: ensureString(unparsedEnv, 'maxAzs') || "2",
-      allowAllOutboundSGAccess: ensureString(unparsedEnv, 'allowAllOutboundSGAccess') || "true",
-      allowAllOutboundSG: ensureString(unparsedEnv, 'allowAllOutboundSG') || "true",
-      fargateMemoryLimitMiB: ensureString(unparsedEnv, 'fargateMemoryLimitMiB') || "512",
-      fargateCpu: ensureString(unparsedEnv, 'fargateCpu') || "256",
-      fargateImage: ensureString(unparsedEnv, 'fargateImage') || "camunda/camunda-bpm-platform",
-      fargateContainerPort: ensureString(unparsedEnv, 'fargateContainerPort') || "8080",
-      allowAllOutboundAlbSG: ensureString(unparsedEnv, 'allowAllOutboundAlbSG') || "true",
-      ingressPortAlbSG: ensureString(unparsedEnv, 'ingressPortAlbSG') || "80",
-      allowAllOutboundServiceSG: ensureString(unparsedEnv, 'allowAllOutboundServiceSG') || "true",
-      ingressPortServiceSG: ensureString(unparsedEnv, 'ingressPortServiceSG') || "8080",
-      desiredCountservice: ensureString(unparsedEnv, 'desiredCountservice') || "1",
-      internetFacinglb: ensureString(unparsedEnv, 'internetFacinglb') || "true",
-      portListener: ensureString(unparsedEnv, 'portListener') || "80",
-      portTargetGroup: ensureString(unparsedEnv, 'portTargetGroup') || "8080",
-      pathHealthCheck: ensureString(unparsedEnv, 'pathHealthCheck') || "/",
-      intervalHealthCheck: ensureString(unparsedEnv, 'intervalHealthCheck') || "1",
-      healthyThresholdCount: ensureString(unparsedEnv, 'healthyThresholdCount') || "7",
-      unhealthyThresholdCount: ensureString(unparsedEnv, 'unhealthyThresholdCount') || "7",
-      healthyHttpCodes: ensureString(unparsedEnv, 'healthyHttpCodes') || "200-399",
-      targetUtilizationPercent: ensureString(unparsedEnv, 'targetUtilizationPercent') || "50",
-      DbName: ensureString(unparsedEnv, 'DbName') || "processengine",
-      DbUser: ensureString(unparsedEnv, 'DbUser' || "camunda"),
-      DbInstType: ensureString(unparsedEnv, 'DbInstType' || "small"),
-      DbInstClass: ensureString(unparsedEnv, 'DbInstClass' || "t3")
+
+      Cidr: unparsedEnv.Cidr || "10.11.0.0/16",
+      enableDnsSupport: unparsedEnv.enableDnsSupport || "true",
+      natGateways: unparsedEnv.natGateways || "1",
+      enableDnsHostnames: unparsedEnv.enableDnsHostnames || "true",
+      maxAzs: unparsedEnv.maxAzs || "2",
+      allowAllOutboundSGAccess: unparsedEnv.allowAllOutboundSGAccess || "true",
+      allowAllOutboundSG: unparsedEnv.allowAllOutboundSG || "true",
+      fargateMemoryLimitMiB: unparsedEnv.fargateMemoryLimitMiB || "512",
+      fargateCpu: unparsedEnv.fargateCpu || "256",
+      fargateImage: unparsedEnv.fargateImage || "camunda/camunda-bpm-platform",
+      fargateContainerPort: unparsedEnv.fargateContainerPort || "8080",
+      allowAllOutboundAlbSG: unparsedEnv.allowAllOutboundAlbSG || "true",
+      ingressPortAlbSG: unparsedEnv.ingressPortAlbSG || "80",
+      allowAllOutboundServiceSG: unparsedEnv.allowAllOutboundServiceSG || "true",
+      ingressPortServiceSG: unparsedEnv.ingressPortServiceSG || "8080",
+      desiredCountservice: unparsedEnv.desiredCountservice || "1",
+      internetFacinglb: unparsedEnv.internetFacinglb || "true",
+      portListener: unparsedEnv.portListener || "80",
+      portTargetGroup: unparsedEnv.portTargetGroup || "8080",
+      pathHealthCheck: unparsedEnv.pathHealthCheck || "/",
+      intervalHealthCheck: unparsedEnv.intervalHealthCheck || "1",
+      healthyThresholdCount: unparsedEnv.healthyThresholdCount || "7",
+      unhealthyThresholdCount: unparsedEnv.unhealthyThresholdCount || "7",
+      healthyHttpCodes: unparsedEnv.healthyHttpCodes || "200-399",
+      targetUtilizationPercent: unparsedEnv.targetUtilizationPercent || "50",
+      DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion,
+      DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion,
+      DbName: unparsedEnv.DbName || "processengine",
+      DbUser: unparsedEnv.DbUser  || "camunda",
+      DbInstType: unparsedEnv.DbInstType || "small",
+      DbInstClass: unparsedEnv.DbInstClass|| "t3"
   };
 
   return buildConfig;

@@ -29,6 +29,8 @@ export interface BuildConfig
   readonly unhealthyThresholdCount: string;
   readonly healthyHttpCodes: string;
   readonly targetUtilizationPercent: string;
+  readonly DatabaseInstanceEngineFullVersion: string;
+  readonly DatabaseInstanceEngineMajorVersion: string;
   readonly DbName : string;
   readonly DbUser : string;
   readonly DbInstType : string;

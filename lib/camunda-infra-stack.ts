@@ -11,11 +11,15 @@ export class CamundaInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, buildConfig: BuildConfig, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    function convertStringToBool(boolStr:string):boolean{
+      return (/true/i).test(boolStr)
+    }
+
     const vpc = new ec2.Vpc(this, 'camundaVPC', {
       cidr: buildConfig.Cidr,
-      enableDnsSupport: !!buildConfig.enableDnsSupport,
+      enableDnsSupport: convertStringToBool(buildConfig.enableDnsSupport),
       natGateways: +buildConfig.natGateways,
-      enableDnsHostnames: !!buildConfig.enableDnsHostnames,
+      enableDnsHostnames: convertStringToBool(buildConfig.enableDnsHostnames),
       maxAzs: +buildConfig.maxAzs,
       subnetConfiguration: [
         {
@@ -47,14 +51,14 @@ export class CamundaInfraStack extends cdk.Stack {
     // Create SG for RDS
     const postgresSGAccess = new ec2.SecurityGroup(this, `rds-security-group-access`, {
       vpc: vpc,
-      allowAllOutbound: !!buildConfig.allowAllOutboundSGAccess,
+      allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundSGAccess),
       description: 'SG to access Postgres',
     });
     Tags.of(postgresSGAccess).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds-sg-access`)
 
     const postgresSG = new ec2.SecurityGroup(this, `rds-security-group`, {
       vpc: vpc,
-      allowAllOutbound: !!buildConfig.allowAllOutboundSG,
+      allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundSG),
       description: 'SG to attach to Postgres'
     });
     postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
@@ -69,7 +73,12 @@ export class CamundaInfraStack extends cdk.Stack {
 
     // Create an RDS instance
     const rdsInstance = new rds.DatabaseInstance(this, 'CamundaInstance', {
-      engine: rds.DatabaseInstanceEngine.postgres({version: rds.PostgresEngineVersion.VER_12_5}),
+      engine: rds.DatabaseInstanceEngine.postgres({
+          version: rds.PostgresEngineVersion.of(
+              buildConfig.DatabaseInstanceEngineFullVersion,
+              buildConfig.DatabaseInstanceEngineMajorVersion
+          )
+      }),
       instanceType: new ec2.InstanceType(`${buildConfig.DbInstClass}.${buildConfig.DbInstType}`),
       vpc: vpc,
       vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
@@ -107,7 +116,7 @@ export class CamundaInfraStack extends cdk.Stack {
     // Create SG for ALB
     const AlbSG = new ec2.SecurityGroup(this, `Alb-security-group`, {
       vpc: vpc,
-      allowAllOutbound: !!buildConfig.allowAllOutboundAlbSG,
+      allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundAlbSG),
       description: 'SG for ALB'
     });
     AlbSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(+buildConfig.ingressPortAlbSG), 'HTTP ingress from anywhere');
@@ -116,7 +125,7 @@ export class CamundaInfraStack extends cdk.Stack {
     // Create SG for Service
     const ServiceSG = new ec2.SecurityGroup(this, `Alb-security-group-access`, {
       vpc: vpc,
-      allowAllOutbound: !!buildConfig.allowAllOutboundServiceSG,
+      allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundServiceSG),
       description: 'SG for camunda service'
     });
     ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(+buildConfig.ingressPortServiceSG), 'Ingress from ALB sg');
@@ -136,7 +145,7 @@ export class CamundaInfraStack extends cdk.Stack {
     // Create ALB
     const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
       vpc,
-      internetFacing: !!buildConfig.internetFacinglb,
+      internetFacing: convertStringToBool(buildConfig.internetFacinglb),
       securityGroup: AlbSG,
       loadBalancerName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-lb`
     });
