@@ -86,8 +86,9 @@
       "fargateMemoryLimitMiB": "512",
       "fargateCpu": "256",
 
-      "fargateImage": "camunda/camunda-bpm-platform",
+      "fargateImage": "camunda/camunda-bpm-platform:7.15.0",
       "fargateContainerPort": "8080",
+      "fargateLogRetention": "60",
 
       "allowAllOutboundAlbSG": "true",
       "ingressPortAlbSG": "80",

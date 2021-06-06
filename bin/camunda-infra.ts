@@ -35,7 +35,7 @@ function getConfig() {
       allowAllOutboundSG: unparsedEnv.allowAllOutboundSG || "true",
       fargateMemoryLimitMiB: unparsedEnv.fargateMemoryLimitMiB || "512",
       fargateCpu: unparsedEnv.fargateCpu || "256",
-      fargateImage: unparsedEnv.fargateImage || "camunda/camunda-bpm-platform",
+      fargateImage: unparsedEnv.fargateImage || "camunda/camunda-bpm-platform:7.15.0",
       fargateContainerPort: unparsedEnv.fargateContainerPort || "8080",
       fargateLogRetention: unparsedEnv.fargateLogRetention || "60",
       allowAllOutboundAlbSG: unparsedEnv.allowAllOutboundAlbSG || "true",
