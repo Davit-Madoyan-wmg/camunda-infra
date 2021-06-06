@@ -80,6 +80,36 @@
       "allowAllOutboundSGAccess": "true",
       "allowAllOutboundSG": "true",
 
+      "PostgresEngineVersion": "VER_12_5",
+
+      "fargateMemoryLimitMiB": "512",
+      "fargateCpu": "256",
+
+      "fargateImage": "camunda/camunda-bpm-platform",
+      "fargateContainerPort": "8080",
+
+      "allowAllOutboundAlbSG": "true",
+      "ingressPortAlbSG": "80",
+
+      "allowAllOutboundServiceSG": "true",
+      "ingressPortServiceSG": "8080",
+
+      "desiredCountservice": "1",
+
+      "internetFacinglb": "true",
+
+      "portListener": "80",
+
+      "portTargetGroup": "8080",
+
+      "pathHealthCheck": "/",
+      "intervalHealthCheck": "1",
+      "healthyThresholdCount": "7",
+      "unhealthyThresholdCount": "7",
+      "healthyHttpCodes": "200-399",
+
+      "targetUtilizationPercent": "50",
+
       "DbInstClass": "t3",
       "DbInstType": "small",
       "DbName": "camunda_db",
