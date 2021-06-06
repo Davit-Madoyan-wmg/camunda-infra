@@ -57,6 +57,8 @@
 
       "targetUtilizationPercent": "50",
 
+      "DatabaseInstanceEngineFullVersion": "12.5",
+      "DatabaseInstanceEngineMajorVersion": "12",
       "DbInstClass": "t3",
       "DbInstType": "small",
       "DbName": "processengine",

@@ -3,7 +3,6 @@ import {Tags} from '@aws-cdk/core';
 import cdk = require('@aws-cdk/core');
 import {CamundaInfraStack} from '../lib/camunda-infra-stack';
 import {BuildConfig} from "../config/build-config";
-import * as rds from "@aws-cdk/aws-rds";
 
 const app = new cdk.App();
 
@@ -52,8 +51,8 @@ function getConfig() {
       unhealthyThresholdCount: unparsedEnv.unhealthyThresholdCount || "7",
       healthyHttpCodes: unparsedEnv.healthyHttpCodes || "200-399",
       targetUtilizationPercent: unparsedEnv.targetUtilizationPercent || "50",
-      DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion,
-      DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion,
+      DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion || "12.5",
+      DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion || "12",
       DbName: unparsedEnv.DbName || "processengine",
       DbUser: unparsedEnv.DbUser  || "camunda",
       DbInstType: unparsedEnv.DbInstType || "small",
