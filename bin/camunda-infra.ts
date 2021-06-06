@@ -53,7 +53,7 @@ function getConfig() {
       targetUtilizationPercent: unparsedEnv.targetUtilizationPercent || "50",
       DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion || "12.5",
       DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion || "12",
-      DbName: unparsedEnv.DbName || "processengine",
+      DbName: unparsedEnv.DbName || "camunda_db",
       DbUser: unparsedEnv.DbUser  || "camunda",
       DbInstType: unparsedEnv.DbInstType || "small",
       DbInstClass: unparsedEnv.DbInstClass|| "t3"

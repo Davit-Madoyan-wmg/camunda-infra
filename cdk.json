@@ -61,7 +61,7 @@
       "DatabaseInstanceEngineMajorVersion": "12",
       "DbInstClass": "t3",
       "DbInstType": "small",
-      "DbName": "processengine",
+      "DbName": "camunda_db",
       "DbUser": "camunda"
     },
     "prod": {
