@@ -35,10 +35,12 @@ export class CamundaInfraStack extends cdk.Stack {
         }
      ]
     })
+    Tags.of(vpc).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-vpc`)
 
     // Create an ECS cluster
     const cluster = new ecs.Cluster(this, 'camundaCluster', {
       vpc: vpc,
+      clusterName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-cluster`
     })
     Tags.of(cluster).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-cluster`)
 
@@ -46,9 +48,9 @@ export class CamundaInfraStack extends cdk.Stack {
     const postgresSGAccess = new ec2.SecurityGroup(this, `rds-security-group-access`, {
       vpc: vpc,
       allowAllOutbound: true,
-      description: 'SG to access Postgres'
+      description: 'SG to access Postgres',
     });
-    Tags.of(postgresSGAccess).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-sgAccess`)
+    Tags.of(postgresSGAccess).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds-sg-access`)
 
     const postgresSG = new ec2.SecurityGroup(this, `rds-security-group`, {
       vpc: vpc,
@@ -56,10 +58,11 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG to attach to Postgres'
     });
     postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
-    Tags.of(postgresSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-sg`)
+    Tags.of(postgresSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds-sg`)
 
     const secret = new rds.DatabaseSecret(this, 'Secret', {
-      username: buildConfig.DbUser
+      username: buildConfig.DbUser,
+      secretName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-dbsecret`
     });
     Tags.of(secret).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-dbsecret`)
 
@@ -72,7 +75,8 @@ export class CamundaInfraStack extends cdk.Stack {
       vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
       databaseName: buildConfig.DbName,
       credentials: rds.Credentials.fromSecret(secret),
-      securityGroups: [postgresSG]
+      securityGroups: [postgresSG],
+      instanceIdentifier: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds`
     })
     Tags.of(rdsInstance).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-rds`)
 
@@ -81,7 +85,6 @@ export class CamundaInfraStack extends cdk.Stack {
       memoryLimitMiB: 512,
       cpu: 256
     });
-    Tags.of(fargateTaskDefinition).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-fargatetaskdefinition`)
 
     // Add params to task definition
     fargateTaskDefinition.addContainer("camunda", {
@@ -99,6 +102,7 @@ export class CamundaInfraStack extends cdk.Stack {
         DB_USERNAME: ecs.Secret.fromSecretsManager(rdsInstance.secret!, 'username'),
       }
     });
+    Tags.of(fargateTaskDefinition).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-fargatetaskdefinition`)
 
     // Create SG for ALB
     const AlbSG = new ec2.SecurityGroup(this, `Alb-security-group`, {
@@ -107,7 +111,7 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG for ALB'
     });
     AlbSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80), 'HTTP ingress from anywhere');
-    Tags.of(AlbSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-alb`)
+    Tags.of(AlbSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-alb-sg`)
 
     // Create SG for Service
     const ServiceSG = new ec2.SecurityGroup(this, `Alb-security-group-access`, {
@@ -116,7 +120,7 @@ export class CamundaInfraStack extends cdk.Stack {
       description: 'SG for camunda service'
     });
     ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(8080), 'Ingress from ALB sg');
-    Tags.of(ServiceSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-serviceSG`)
+    Tags.of(ServiceSG).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-service-sg`)
 
     // Create service
     const service = new ecs.FargateService(this, 'camundaService', {
@@ -124,13 +128,24 @@ export class CamundaInfraStack extends cdk.Stack {
       taskDefinition: fargateTaskDefinition,
       desiredCount: 1,
       vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
-      securityGroups: [postgresSGAccess, ServiceSG]
+      securityGroups: [postgresSGAccess, ServiceSG],
+      serviceName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-service`
     });
     Tags.of(service).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-service`)
 
     // Create ALB
-    const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', { vpc, internetFacing: true, securityGroup: AlbSG });
+    const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
+      vpc, internetFacing: true,
+      securityGroup: AlbSG,
+      loadBalancerName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-lb`
+    });
+    Tags.of(lb).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-lb`)
+
+    //  Create listener
     const listener = lb.addListener('Listener', { port: 80 });
+    Tags.of(listener).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-listener`)
+
+    //  Create targetGroup
     const targetGroup = listener.addTargets('ECS', {
       port: 8080,
       targets: [service],
@@ -140,10 +155,9 @@ export class CamundaInfraStack extends cdk.Stack {
         healthyThresholdCount: 7,
         unhealthyThresholdCount: 7,
         healthyHttpCodes: '200-399'
-      }
+      },
+      targetGroupName: `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-targetgroup`
     });
-    Tags.of(lb).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-lb`)
-    Tags.of(listener).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-listener`)
     Tags.of(targetGroup).add("Name",`${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}-targetgroup`)
 
     // Create ASG

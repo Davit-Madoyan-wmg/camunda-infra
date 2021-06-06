@@ -38,8 +38,9 @@ function getConfig() {
 function Main() {
   let buildConfig: BuildConfig = getConfig();
 
-  Tags.of(app).add('App', buildConfig.App);
-  Tags.of(app).add('Environment', buildConfig.Environment);
+    Tags.of(app).add('Project', buildConfig.Project);
+    Tags.of(app).add('App', buildConfig.App);
+    Tags.of(app).add('Environment', buildConfig.Environment);
 
   let mainStackName = buildConfig.App + "-" + buildConfig.Environment + "-main";
   const mainStack = new CamundaInfraStack(app, mainStackName, buildConfig, {env: {region: buildConfig.AWSProfileRegion}});
