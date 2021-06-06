@@ -49,7 +49,7 @@
 
       "portListener": "80",
 
-      "portTargetGroup": "80",
+      "portTargetGroup": "8080",
 
       "pathHealthCheck": "/",
       "intervalHealthCheck": "1",
