@@ -19,7 +19,45 @@
       "Project": "carpathia",
       "App": "camunda",
       "Environment": "dev",
+
       "Cidr": "10.11.0.0/16",
+      "enableDnsSupport": "true",
+      "natGateways": "1",
+      "enableDnsHostnames": "true",
+      "maxAzs": "2",
+
+      "allowAllOutboundSGAccess": "true",
+      "allowAllOutboundSG": "true",
+
+      "PostgresEngineVersion": "VER_12_5",
+
+      "fargateMemoryLimitMiB": "512",
+      "fargateCpu": "256",
+
+      "fargateImage": "camunda/camunda-bpm-platform",
+      "fargateContainerPort": "8080",
+
+      "allowAllOutboundAlbSG": "true",
+      "ingressPortAlbSG": "80",
+
+      "allowAllOutboundServiceSG": "true",
+      "ingressPortServiceSG": "8080",
+
+      "desiredCountservice": "1",
+
+      "internetFacinglb": "true",
+
+      "portListener": "80",
+
+      "portTargetGroup": "80",
+
+      "pathHealthCheck": "/",
+      "intervalHealthCheck": "1",
+      "healthyThresholdCount": "7",
+      "unhealthyThresholdCount": "7",
+      "healthyHttpCodes": "200-399",
+
+      "targetUtilizationPercent": "50",
 
       "DbInstClass": "t3",
       "DbInstType": "small",
@@ -32,7 +70,15 @@
       "Project": "carpathia",
       "App": "camunda",
       "Environment": "prod",
-      "Cidr": "10.12.0.0/16",
+
+      "Cidr": "10.11.0.0/16",
+      "enableDnsSupport": "true",
+      "natGateways": "1",
+      "enableDnsHostnames": "true",
+      "maxAzs": "2",
+
+      "allowAllOutboundSGAccess": "true",
+      "allowAllOutboundSG": "true",
 
       "DbInstClass": "t3",
       "DbInstType": "small",
