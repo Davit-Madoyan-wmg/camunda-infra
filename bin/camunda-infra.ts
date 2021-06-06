@@ -32,7 +32,6 @@ function getConfig() {
       maxAzs: ensureString(unparsedEnv, 'maxAzs') || "2",
       allowAllOutboundSGAccess: ensureString(unparsedEnv, 'allowAllOutboundSGAccess') || "true",
       allowAllOutboundSG: ensureString(unparsedEnv, 'allowAllOutboundSG') || "true",
-      PostgresEngineVersion: ensureString(unparsedEnv, 'PostgresEngineVersion') || "VER_12_5",
       fargateMemoryLimitMiB: ensureString(unparsedEnv, 'fargateMemoryLimitMiB') || "512",
       fargateCpu: ensureString(unparsedEnv, 'fargateCpu') || "256",
       fargateImage: ensureString(unparsedEnv, 'fargateImage') || "camunda/camunda-bpm-platform",

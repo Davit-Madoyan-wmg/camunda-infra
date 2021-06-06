@@ -29,8 +29,6 @@
       "allowAllOutboundSGAccess": "true",
       "allowAllOutboundSG": "true",
 
-      "PostgresEngineVersion": "VER_12_5",
-
       "fargateMemoryLimitMiB": "512",
       "fargateCpu": "256",
 
@@ -79,8 +77,6 @@
 
       "allowAllOutboundSGAccess": "true",
       "allowAllOutboundSG": "true",
-
-      "PostgresEngineVersion": "VER_12_5",
 
       "fargateMemoryLimitMiB": "512",
       "fargateCpu": "256",

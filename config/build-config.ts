@@ -11,7 +11,6 @@ export interface BuildConfig
   readonly maxAzs: string;
   readonly allowAllOutboundSGAccess: string;
   readonly allowAllOutboundSG: string;
-  readonly PostgresEngineVersion: string;
   readonly fargateMemoryLimitMiB: string;
   readonly fargateCpu: string;
   readonly fargateImage: string;
