@@ -15,6 +15,7 @@ export interface BuildConfig
   readonly fargateCpu: string;
   readonly fargateImage: string;
   readonly fargateContainerPort: string;
+  readonly fargateLogRetention: string;
   readonly allowAllOutboundAlbSG: string;
   readonly ingressPortAlbSG: string;
   readonly allowAllOutboundServiceSG: string;
@@ -29,6 +30,8 @@ export interface BuildConfig
   readonly unhealthyThresholdCount: string;
   readonly healthyHttpCodes: string;
   readonly targetUtilizationPercent: string;
+  readonly ASGmaxCapacity: string;
+  readonly ASGminCapacity: string;
   readonly DatabaseInstanceEngineFullVersion: string;
   readonly DatabaseInstanceEngineMajorVersion: string;
   readonly DbName : string;

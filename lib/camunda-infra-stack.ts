@@ -99,10 +99,10 @@ export class CamundaInfraStack extends cdk.Stack {
     // Add params to task definition
     fargateTaskDefinition.addContainer("camunda", {
       // Use an image from DockerHub
-      image: ecs.ContainerImage.fromRegistry("camunda/camunda-bpm-platform"),
+      image: ecs.ContainerImage.fromRegistry(buildConfig.fargateImage),
       portMappings: [{ containerPort: +buildConfig.fargateContainerPort }],
       containerName: buildConfig.App,
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: `/aws/ecs/${appFullName}` }),
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: `/aws/ecs/${appFullName}`, logRetention: +buildConfig.fargateLogRetention }),
       environment: {
         DB_DRIVER: "org.postgresql.Driver",
         DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress+"/"+buildConfig.DbName
@@ -172,7 +172,7 @@ export class CamundaInfraStack extends cdk.Stack {
     Tags.of(targetGroup).add("Name",`${appFullName}`)
 
     // Create ASG
-    const scaling = service.autoScaleTaskCount({ maxCapacity: 10, minCapacity: 1 });
+    const scaling = service.autoScaleTaskCount({ maxCapacity: +buildConfig.ASGmaxCapacity, minCapacity: +buildConfig.ASGminCapacity });
     scaling.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: +buildConfig.targetUtilizationPercent
     });
