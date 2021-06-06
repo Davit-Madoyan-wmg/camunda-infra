@@ -92,7 +92,7 @@ export class CamundaInfraStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry("camunda/camunda-bpm-platform"),
       portMappings: [{ containerPort: +buildConfig.fargateContainerPort }],
       containerName: buildConfig.App,
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'camunda' }),
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: `/aws/ecs/${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}` }),
       environment: {
         DB_DRIVER: "org.postgresql.Driver",
         DB_URL: "jdbc:postgresql://"+rdsInstance.instanceEndpoint.socketAddress+"/"+buildConfig.DbName
