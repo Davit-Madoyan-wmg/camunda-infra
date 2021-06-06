@@ -32,8 +32,9 @@
       "fargateMemoryLimitMiB": "512",
       "fargateCpu": "256",
 
-      "fargateImage": "camunda/camunda-bpm-platform",
+      "fargateImage": "camunda/camunda-bpm-platform:7.15.0",
       "fargateContainerPort": "8080",
+      "fargateLogRetention": "60",
 
       "allowAllOutboundAlbSG": "true",
       "ingressPortAlbSG": "80",
@@ -56,6 +57,8 @@
       "healthyHttpCodes": "200-399",
 
       "targetUtilizationPercent": "50",
+      "ASGmaxCapacity": "10",
+      "ASGminCapacity": "1",
 
       "DatabaseInstanceEngineFullVersion": "12.5",
       "DatabaseInstanceEngineMajorVersion": "12",
