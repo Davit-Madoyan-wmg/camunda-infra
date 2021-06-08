@@ -4,7 +4,6 @@ import {GetCallerIdentityCommandOutput} from "@aws-sdk/client-sts";
 export interface RuntimeProps {
     bucketList: ListBucketsCommandOutput;
     callerIdentity: GetCallerIdentityCommandOutput;
-    // deploymentTarget?: 'dev' | 'qa' | 'uat' | 'prod';
 }
 
 export interface BuildConfig {
