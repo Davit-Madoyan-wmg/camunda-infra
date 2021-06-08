@@ -7,42 +7,68 @@ export interface RuntimeProps {
 }
 
 export interface BuildConfig {
-    readonly AWSProfileRegion: string;
-    readonly Project: string;
-    readonly App: string;
-    readonly Environment: string;
-    readonly Cidr: string;
-    readonly enableDnsSupport: string;
-    readonly natGateways: string;
-    readonly enableDnsHostnames: string;
-    readonly maxAzs: string;
-    readonly allowAllOutboundSGAccess: string;
-    readonly allowAllOutboundSG: string;
-    readonly fargateMemoryLimitMiB: string;
-    readonly fargateCpu: string;
-    readonly fargateImage: string;
-    readonly fargateContainerPort: string;
-    readonly fargateLogRetention: string;
-    readonly allowAllOutboundAlbSG: string;
-    readonly ingressPortAlbSG: string;
-    readonly allowAllOutboundServiceSG: string;
-    readonly ingressPortServiceSG: string;
-    readonly desiredCountservice: string;
-    readonly internetFacinglb: string;
-    readonly portListener: string;
-    readonly portTargetGroup: string;
-    readonly pathHealthCheck: string;
-    readonly intervalHealthCheck: string;
-    readonly healthyThresholdCount: string;
-    readonly unhealthyThresholdCount: string;
-    readonly healthyHttpCodes: string;
-    readonly targetUtilizationPercent: string;
-    readonly ASGmaxCapacity: string;
-    readonly ASGminCapacity: string;
-    readonly DatabaseInstanceEngineFullVersion: string;
-    readonly DatabaseInstanceEngineMajorVersion: string;
-    readonly DbName: string;
-    readonly DbUser: string;
-    readonly DbInstType: string;
-    readonly DbInstClass: string;
+    readonly AWS_PROFILE_REGION: string;
+    readonly PROJECT: string;
+    readonly APP: string;
+    readonly ENVIRONMENT: string;
+    readonly VPC: {
+        readonly cidr: string;
+        readonly enableDnsSupport: string;
+        readonly natGateways: string;
+        readonly enableDnsHostnames: string;
+        readonly maxAzs: string;
+    },
+    readonly POSTGRES_SG_ACCESS: {
+        readonly allowAllOutbound: string;
+    },
+    readonly POSTGRES_SG: {
+        readonly allowAllOutbound: string;
+    },
+    readonly FARGATE: {
+        readonly memoryLimitMiB: string;
+        readonly cpu: string;
+        readonly image: string;
+        readonly containerPort: string;
+        readonly logRetention: string;
+    },
+    readonly ALB_SG: {
+        readonly allowAllOutbound: string;
+        readonly ingressPort: string;
+    },
+    readonly SERVICE_SG: {
+        readonly allowAllOutbound: string;
+        readonly ingressPort: string;
+    },
+    readonly SERVICE: {
+        readonly desiredCount: string;
+    },
+    readonly LOAD_BALANCER: {
+        readonly internetFacing: string;
+    },
+    readonly LISTENER: {
+        readonly port: string;
+    },
+    readonly TARGET_GROUP: {
+        readonly port: string;
+        readonly HealthCheck: {
+            readonly path: string;
+            readonly interval: string;
+            readonly healthyThresholdCount: string;
+            readonly unhealthyThresholdCount: string;
+            readonly healthyHttpCodes: string;
+        }
+    },
+    readonly AUTO_SCALING_GROUP: {
+        readonly targetUtilizationPercent: string;
+        readonly maxCapacity: string;
+        readonly minCapacity: string;
+    },
+    readonly RDS: {
+        readonly DatabaseInstanceEngineFullVersion: string;
+        readonly DatabaseInstanceEngineMajorVersion: string;
+        readonly InstanceClass: string;
+        readonly InstanceType: string;
+        readonly databaseName: string;
+        readonly username: string;
+    }
 }
