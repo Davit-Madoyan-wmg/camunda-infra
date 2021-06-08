@@ -50,8 +50,8 @@ export class CamundaInfraStack extends cdk.Stack {
         Tags.of(vpc).add("Name", `${appFullName}-vpc`)
 
         // Bucket setup for web distribution bucket
-        const {bucketList: {Buckets = []}, callerIdentity, deploymentTarget = 'dev'} = runtimeProps;
-        const bucketId = `web-distribution-bucket-${deploymentTarget}`;
+        const {bucketList: {Buckets = []}, callerIdentity} = runtimeProps;
+        const bucketId = `web-distribution-bucket-${buildConfig.Environment}`;
         const bucketName = `carpathia-wmg-${bucketId}-${callerIdentity.Account}`;
 
         const webDistributionBucket = Buckets.some((b: any) => b.Name === bucketName) ?
@@ -92,7 +92,7 @@ export class CamundaInfraStack extends cdk.Stack {
 
 
         // Cloudfront Distribution
-        const cloudfrontDistributionId = `cloudfront-web-distribution-${deploymentTarget}`;
+        const cloudfrontDistributionId = `cloudfront-web-distribution-${buildConfig.Environment}`;
         const cloudfrontDistribution = new CloudfrontDistribution(this, cloudfrontDistributionId, {
             defaultBehavior: {
                 origin: new S3Origin(webDistributionBucket),
