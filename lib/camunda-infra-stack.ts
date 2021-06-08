@@ -21,14 +21,56 @@ export class CamundaInfraStack extends cdk.Stack {
             return (/true/i).test(boolStr)
         }
 
-        const appFullName = `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}`
+        // Destructuring "buildconfig"
+        const {
+            AWSProfileRegion,
+            Project,
+            App,
+            Environment,
+            Cidr,
+            enableDnsSupport,
+            natGateways,
+            enableDnsHostnames,
+            maxAzs,
+            allowAllOutboundSGAccess,
+            allowAllOutboundSG,
+            fargateMemoryLimitMiB,
+            fargateCpu,
+            fargateImage,
+            fargateContainerPort,
+            fargateLogRetention,
+            allowAllOutboundAlbSG,
+            ingressPortAlbSG,
+            allowAllOutboundServiceSG,
+            ingressPortServiceSG,
+            desiredCountservice,
+            internetFacinglb,
+            portListener,
+            portTargetGroup,
+            pathHealthCheck,
+            intervalHealthCheck,
+            healthyThresholdCount,
+            unhealthyThresholdCount,
+            healthyHttpCodes,
+            targetUtilizationPercent,
+            ASGmaxCapacity,
+            ASGminCapacity,
+            DatabaseInstanceEngineFullVersion,
+            DatabaseInstanceEngineMajorVersion,
+            DbName,
+            DbUser,
+            DbInstType,
+            DbInstClass,
+        } = buildConfig;
+
+        const appFullName = `${Project}-${App}-${Environment}`
 
         const vpc = new ec2.Vpc(this, 'camundaVPC', {
-            cidr: buildConfig.Cidr,
-            enableDnsSupport: convertStringToBool(buildConfig.enableDnsSupport),
-            natGateways: +buildConfig.natGateways,
-            enableDnsHostnames: convertStringToBool(buildConfig.enableDnsHostnames),
-            maxAzs: +buildConfig.maxAzs,
+            cidr: Cidr,
+            enableDnsSupport: convertStringToBool(enableDnsSupport),
+            natGateways: +natGateways,
+            enableDnsHostnames: convertStringToBool(enableDnsHostnames),
+            maxAzs: +maxAzs,
             subnetConfiguration: [
                 {
                     cidrMask: 24,
@@ -51,7 +93,7 @@ export class CamundaInfraStack extends cdk.Stack {
 
         // Bucket setup for web distribution bucket
         const {bucketList: {Buckets = []}, callerIdentity} = runtimeProps;
-        const bucketId = `web-distribution-bucket-${buildConfig.Environment}`;
+        const bucketId = `web-distribution-bucket-${Environment}`;
         const bucketName = `carpathia-wmg-${bucketId}-${callerIdentity.Account}`;
 
         const webDistributionBucket = Buckets.some((b: any) => b.Name === bucketName) ?
@@ -92,7 +134,7 @@ export class CamundaInfraStack extends cdk.Stack {
 
 
         // Cloudfront Distribution
-        const cloudfrontDistributionId = `cloudfront-web-distribution-${buildConfig.Environment}`;
+        const cloudfrontDistributionId = `cloudfront-web-distribution-${Environment}`;
         const cloudfrontDistribution = new CloudfrontDistribution(this, cloudfrontDistributionId, {
             defaultBehavior: {
                 origin: new S3Origin(webDistributionBucket),
@@ -145,21 +187,21 @@ export class CamundaInfraStack extends cdk.Stack {
         // Create SG for RDS
         const postgresSGAccess = new ec2.SecurityGroup(this, `rds-security-group-access`, {
             vpc: vpc,
-            allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundSGAccess),
+            allowAllOutbound: convertStringToBool(allowAllOutboundSGAccess),
             description: 'SG to access Postgres',
         });
         Tags.of(postgresSGAccess).add("Name", `${appFullName}-rds-access-sg`)
 
         const postgresSG = new ec2.SecurityGroup(this, `rds-security-group`, {
             vpc: vpc,
-            allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundSG),
+            allowAllOutbound: convertStringToBool(allowAllOutboundSG),
             description: 'SG to attach to Postgres'
         });
         postgresSG.connections.allowFrom(postgresSGAccess, ec2.Port.tcp(5432), 'Ingress postgres from postgresSGAccess');
         Tags.of(postgresSG).add("Name", `${appFullName}-rds-sg`)
 
         const secret = new rds.DatabaseSecret(this, 'Secret', {
-            username: buildConfig.DbUser,
+            username: DbUser,
             secretName: `${appFullName}-dbsecret`
         });
         Tags.of(secret).add("Name", `${appFullName}-dbsecret`)
@@ -168,14 +210,14 @@ export class CamundaInfraStack extends cdk.Stack {
         const rdsInstance = new rds.DatabaseInstance(this, 'CamundaInstance', {
             engine: rds.DatabaseInstanceEngine.postgres({
                 version: rds.PostgresEngineVersion.of(
-                    buildConfig.DatabaseInstanceEngineFullVersion,
-                    buildConfig.DatabaseInstanceEngineMajorVersion
+                    DatabaseInstanceEngineFullVersion,
+                    DatabaseInstanceEngineMajorVersion
                 )
             }),
-            instanceType: new ec2.InstanceType(`${buildConfig.DbInstClass}.${buildConfig.DbInstType}`),
+            instanceType: new ec2.InstanceType(`${DbInstClass}.${DbInstType}`),
             vpc: vpc,
             vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
-            databaseName: buildConfig.DbName,
+            databaseName: DbName,
             credentials: rds.Credentials.fromSecret(secret),
             securityGroups: [postgresSG],
             instanceIdentifier: `${appFullName}-rds`
@@ -184,23 +226,23 @@ export class CamundaInfraStack extends cdk.Stack {
 
         // Create a task definition
         const fargateTaskDefinition = new ecs.FargateTaskDefinition(this, 'camundaTaskDef', {
-            memoryLimitMiB: +buildConfig.fargateMemoryLimitMiB,
-            cpu: +buildConfig.fargateCpu
+            memoryLimitMiB: +fargateMemoryLimitMiB,
+            cpu: +fargateCpu
         });
 
         // Add params to task definition
         fargateTaskDefinition.addContainer("camunda", {
             // Use an image from DockerHub
-            image: ecs.ContainerImage.fromRegistry(buildConfig.fargateImage),
-            portMappings: [{containerPort: +buildConfig.fargateContainerPort}],
-            containerName: buildConfig.App,
+            image: ecs.ContainerImage.fromRegistry(fargateImage),
+            portMappings: [{containerPort: +fargateContainerPort}],
+            containerName: App,
             logging: ecs.LogDrivers.awsLogs({
                 streamPrefix: `/aws/ecs/${appFullName}`,
-                logRetention: +buildConfig.fargateLogRetention
+                logRetention: +fargateLogRetention
             }),
             environment: {
                 DB_DRIVER: "org.postgresql.Driver",
-                DB_URL: "jdbc:postgresql://" + rdsInstance.instanceEndpoint.socketAddress + "/" + buildConfig.DbName
+                DB_URL: "jdbc:postgresql://" + rdsInstance.instanceEndpoint.socketAddress + "/" + DbName
             },
             secrets: {
                 DB_PASSWORD: ecs.Secret.fromSecretsManager(rdsInstance.secret!, 'password'),
@@ -212,26 +254,26 @@ export class CamundaInfraStack extends cdk.Stack {
         // Create SG for ALB
         const AlbSG = new ec2.SecurityGroup(this, `Alb-security-group`, {
             vpc: vpc,
-            allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundAlbSG),
+            allowAllOutbound: convertStringToBool(allowAllOutboundAlbSG),
             description: 'SG for ALB'
         });
-        AlbSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(+buildConfig.ingressPortAlbSG), 'HTTP ingress from anywhere');
+        AlbSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(+ingressPortAlbSG), 'HTTP ingress from anywhere');
         Tags.of(AlbSG).add("Name", `${appFullName}-alb-sg`)
 
         // Create SG for Service
         const ServiceSG = new ec2.SecurityGroup(this, `Alb-security-group-access`, {
             vpc: vpc,
-            allowAllOutbound: convertStringToBool(buildConfig.allowAllOutboundServiceSG),
+            allowAllOutbound: convertStringToBool(allowAllOutboundServiceSG),
             description: 'SG for camunda service'
         });
-        ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(+buildConfig.ingressPortServiceSG), 'Ingress from ALB sg');
+        ServiceSG.connections.allowFrom(AlbSG, ec2.Port.tcp(+ingressPortServiceSG), 'Ingress from ALB sg');
         Tags.of(ServiceSG).add("Name", `${appFullName}-service-sg`)
 
         // Create service
         const service = new ecs.FargateService(this, 'camundaService', {
             cluster: cluster,
             taskDefinition: fargateTaskDefinition,
-            desiredCount: +buildConfig.desiredCountservice,
+            desiredCount: +desiredCountservice,
             vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
             securityGroups: [postgresSGAccess, ServiceSG],
             serviceName: `${appFullName}-service`
@@ -241,26 +283,26 @@ export class CamundaInfraStack extends cdk.Stack {
         // Create ALB
         const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
             vpc,
-            internetFacing: convertStringToBool(buildConfig.internetFacinglb),
+            internetFacing: convertStringToBool(internetFacinglb),
             securityGroup: AlbSG,
             loadBalancerName: `${appFullName}-lb`
         });
         Tags.of(lb).add("Name", `${appFullName}-lb`)
 
         //  Create listener
-        const listener = lb.addListener('Listener', {port: +buildConfig.portListener});
+        const listener = lb.addListener('Listener', {port: +portListener});
         Tags.of(listener).add("Name", `${appFullName}-listener`)
 
         //  Create targetGroup
         const targetGroup = listener.addTargets('ECS', {
-            port: +buildConfig.portTargetGroup,
+            port: +portTargetGroup,
             targets: [service],
             healthCheck: {
-                path: buildConfig.pathHealthCheck,
-                interval: cdk.Duration.minutes(+buildConfig.intervalHealthCheck),
-                healthyThresholdCount: +buildConfig.healthyThresholdCount,
-                unhealthyThresholdCount: +buildConfig.unhealthyThresholdCount,
-                healthyHttpCodes: buildConfig.healthyHttpCodes
+                path: pathHealthCheck,
+                interval: cdk.Duration.minutes(+intervalHealthCheck),
+                healthyThresholdCount: +healthyThresholdCount,
+                unhealthyThresholdCount: +unhealthyThresholdCount,
+                healthyHttpCodes: healthyHttpCodes
             },
             targetGroupName: `${appFullName}`
         });
@@ -268,11 +310,11 @@ export class CamundaInfraStack extends cdk.Stack {
 
         // Create ASG
         const scaling = service.autoScaleTaskCount({
-            maxCapacity: +buildConfig.ASGmaxCapacity,
-            minCapacity: +buildConfig.ASGminCapacity
+            maxCapacity: +ASGmaxCapacity,
+            minCapacity: +ASGminCapacity
         });
         scaling.scaleOnCpuUtilization('CpuScaling', {
-            targetUtilizationPercent: +buildConfig.targetUtilizationPercent
+            targetUtilizationPercent: +targetUtilizationPercent
         });
         Tags.of(scaling).add("Name", `${appFullName}-asg`)
 
