@@ -184,7 +184,7 @@ export class CamundaInfraStack extends cdk.Stack {
             }),
             instanceType: new ec2.InstanceType(`${RDS.InstanceClass}.${RDS.InstanceType}`),
             vpc: vpc,
-            vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
+            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
             databaseName: RDS.databaseName,
             credentials: rds.Credentials.fromSecret(secret),
             securityGroups: [postgresSG],
