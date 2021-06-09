@@ -1,0 +1,40 @@
+{
+  "vpc-provider:account=713291583775:filter.tag:Name=wmg-carpathia-nonprod-ue1-vpc:region=us-east-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0e1727a04f8f6ce3c",
+    "vpcCidrBlock": "10.28.80.0/24",
+    "availabilityZones": [],
+    "vpnGatewayId": "vgw-069b60f148e6a9fab",
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0922f122c45c77ddd",
+            "cidr": "10.28.80.0/26",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0252be90b791abaaa"
+          }
+        ]
+      },
+      {
+        "name": "Private",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-02dbfd8a337ccce19",
+            "cidr": "10.28.80.64/26",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0906f5a53bcae087b"
+          },
+          {
+            "subnetId": "subnet-09701e0f32de70c89",
+            "cidr": "10.28.80.128/26",
+            "availabilityZone": "us-east-1c",
+            "routeTableId": "rtb-018b83b257ba1c60a"
+          }
+        ]
+      }
+    ]
+  }
+}

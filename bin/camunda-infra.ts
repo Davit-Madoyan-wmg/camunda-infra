@@ -73,7 +73,7 @@ function Main() {
     Tags.of(app).add('Environment', buildConfig.Environment);
 
   let mainStackName = buildConfig.App + "-" + buildConfig.Environment + "-main";
-  const mainStack = new CamundaInfraStack(app, mainStackName, buildConfig, {env: {region: buildConfig.AWSProfileRegion}});
+  const mainStack = new CamundaInfraStack(app, mainStackName, buildConfig, {env: {region: buildConfig.AWSProfileRegion, account: '713291583775'}});
 }
 
 Main();
