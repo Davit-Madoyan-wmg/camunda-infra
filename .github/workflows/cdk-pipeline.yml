@@ -24,7 +24,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.WMG_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.WMG_AWS_SECRET_ACCESS_KEY }}
-          # aws-session-token: ${{ secrets.WMG_AWS_SESSION_TOKEN }} # if you have/need it
+          aws-session-token: ${{ secrets.WMG_AWS_SESSION_TOKEN }} # if you have/need it
           aws-region: ${{ env.REGION }}
       # Installs CDK and other prerequisites
       - name: Prerequisite Installation
