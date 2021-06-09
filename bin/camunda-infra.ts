@@ -25,6 +25,7 @@ function getConfig() {
     const buildConfig: BuildConfig = {
 
         AWS_PROFILE_REGION: ensureString(unparsedEnv, 'AWS_PROFILE_REGION'),
+        ACCOUNT: ensureString(unparsedEnv, 'ACCOUNT'),
         PROJECT: ensureString(unparsedEnv, 'PROJECT'),
         APP: ensureString(unparsedEnv, 'APP'),
         ENVIRONMENT: ensureString(unparsedEnv, 'ENVIRONMENT'),
@@ -120,9 +121,10 @@ const main = async () => {
         {
             env: {
                 region: buildConfig.AWS_PROFILE_REGION,
-                account: '713291583775'
+                account: buildConfig.ACCOUNT
             }
-        });
+        }
+    );
 }
 
 main();

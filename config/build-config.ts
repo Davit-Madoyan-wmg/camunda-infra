@@ -8,6 +8,7 @@ export interface RuntimeProps {
 
 export interface BuildConfig {
     readonly AWS_PROFILE_REGION: string;
+    readonly ACCOUNT: string;
     readonly PROJECT: string;
     readonly APP: string;
     readonly ENVIRONMENT: string;
