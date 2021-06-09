@@ -12,112 +12,137 @@
     "@aws-cdk/aws-ecs-patterns:removeDefaultDesiredCount": true,
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
     "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
-
     "dev": {
-      "AWSProfileRegion" : "us-east-1",
-
-      "Project": "carpathia",
-      "App": "camunda",
-      "Environment": "dev",
-
-      "Cidr": "10.11.0.0/16",
-      "enableDnsSupport": "true",
-      "natGateways": "1",
-      "enableDnsHostnames": "true",
-      "maxAzs": "2",
-
-      "allowAllOutboundSGAccess": "true",
-      "allowAllOutboundSG": "true",
-
-      "fargateMemoryLimitMiB": "512",
-      "fargateCpu": "256",
-
-      "fargateImage": "camunda/camunda-bpm-platform:7.15.0",
-      "fargateContainerPort": "8080",
-      "fargateLogRetention": "60",
-
-      "allowAllOutboundAlbSG": "true",
-      "ingressPortAlbSG": "80",
-
-      "allowAllOutboundServiceSG": "true",
-      "ingressPortServiceSG": "8080",
-
-      "desiredCountservice": "1",
-
-      "internetFacinglb": "true",
-
-      "portListener": "80",
-
-      "portTargetGroup": "8080",
-
-      "pathHealthCheck": "/",
-      "intervalHealthCheck": "1",
-      "healthyThresholdCount": "7",
-      "unhealthyThresholdCount": "7",
-      "healthyHttpCodes": "200-399",
-
-      "targetUtilizationPercent": "50",
-      "ASGmaxCapacity": "10",
-      "ASGminCapacity": "1",
-
-      "DatabaseInstanceEngineFullVersion": "12.5",
-      "DatabaseInstanceEngineMajorVersion": "12",
-      "DbInstClass": "t3",
-      "DbInstType": "small",
-      "DbName": "camunda_db",
-      "DbUser": "camunda"
+      "AWS_PROFILE_REGION": "us-east-1",
+      "PROJECT": "carpathia",
+      "APP": "camunda",
+      "ENVIRONMENT": "dev",
+      "VPC": {
+        "cidr": "10.11.0.0/16",
+        "enableDnsSupport": "true",
+        "natGateways": "1",
+        "enableDnsHostnames": "true",
+        "maxAzs": "2"
+      },
+      "POSTGRES_SG_ACCESS": {
+        "allowAllOutbound": "true"
+      },
+      "POSTGRES_SG": {
+        "allowAllOutbound": "true"
+      },
+      "FARGATE": {
+        "memoryLimitMiB": "512",
+        "cpu": "256",
+        "image": "camunda/camunda-bpm-platform:7.15.0",
+        "containerPort": "8080",
+        "logRetention": "60"
+      },
+      "ALB_SG": {
+        "allowAllOutbound": "true",
+        "ingressPort": "80"
+      },
+      "SERVICE_SG": {
+        "allowAllOutbound": "true",
+        "ingressPort": "8080"
+      },
+      "SERVICE": {
+        "desiredCount": "1"
+      },
+      "LOAD_BALANCER": {
+        "internetFacing": "true"
+      },
+      "LISTENER": {
+        "port": "80"
+      },
+      "TARGET_GROUP": {
+        "port": "8080",
+        "HealthCheck": {
+          "path": "/",
+          "interval": "1",
+          "healthyThresholdCount": "7",
+          "unhealthyThresholdCount": "7",
+          "healthyHttpCodes": "200-399"
+        }
+      },
+      "AUTO_SCALING_GROUP": {
+        "targetUtilizationPercent": "50",
+        "maxCapacity": "10",
+        "minCapacity": "1"
+      },
+      "RDS": {
+        "DatabaseInstanceEngineFullVersion": "12.5",
+        "DatabaseInstanceEngineMajorVersion": "12",
+        "InstanceClass": "t3",
+        "InstanceType": "small",
+        "databaseName": "camunda_db",
+        "username": "camunda"
+      }
     },
     "prod": {
-      "AWSProfileRegion" : "us-east-1",
-
-      "Project": "carpathia",
-      "App": "camunda",
-      "Environment": "prod",
-
-      "Cidr": "10.11.0.0/16",
-      "enableDnsSupport": "true",
-      "natGateways": "1",
-      "enableDnsHostnames": "true",
-      "maxAzs": "2",
-
-      "allowAllOutboundSGAccess": "true",
-      "allowAllOutboundSG": "true",
-
-      "fargateMemoryLimitMiB": "512",
-      "fargateCpu": "256",
-
-      "fargateImage": "camunda/camunda-bpm-platform:7.15.0",
-      "fargateContainerPort": "8080",
-      "fargateLogRetention": "60",
-
-      "allowAllOutboundAlbSG": "true",
-      "ingressPortAlbSG": "80",
-
-      "allowAllOutboundServiceSG": "true",
-      "ingressPortServiceSG": "8080",
-
-      "desiredCountservice": "1",
-
-      "internetFacinglb": "true",
-
-      "portListener": "80",
-
-      "portTargetGroup": "8080",
-
-      "pathHealthCheck": "/",
-      "intervalHealthCheck": "1",
-      "healthyThresholdCount": "7",
-      "unhealthyThresholdCount": "7",
-      "healthyHttpCodes": "200-399",
-
-      "targetUtilizationPercent": "50",
-
-      "DatabaseInstanceEngineFullVersion": "12.5",
-      "DatabaseInstanceEngineMajorVersion": "12",
-      "DbInstClass": "t3",
-      "DbInstType": "small",
-      "DbName": "camunda_db",
-      "DbUser": "camunda"
+      "AWS_PROFILE_REGION": "us-east-2",
+      "PROJECT": "carpathia",
+      "APP": "camunda",
+      "ENVIRONMENT": "prod",
+      "VPC": {
+        "cidr": "10.11.0.0/16",
+        "enableDnsSupport": "true",
+        "natGateways": "1",
+        "enableDnsHostnames": "true",
+        "maxAzs": "2"
+      },
+      "POSTGRES_SG_ACCESS": {
+        "allowAllOutbound": "true"
+      },
+      "POSTGRES_SG": {
+        "allowAllOutbound": "true"
+      },
+      "FARGATE": {
+        "memoryLimitMiB": "512",
+        "cpu": "256",
+        "image": "camunda/camunda-bpm-platform:7.15.0",
+        "containerPort": "8080",
+        "logRetention": "60"
+      },
+      "ALB_SG": {
+        "allowAllOutbound": "true",
+        "ingressPort": "80"
+      },
+      "SERVICE_SG": {
+        "allowAllOutbound": "true",
+        "ingressPort": "8080"
+      },
+      "SERVICE": {
+        "desiredCount": "1"
+      },
+      "LOAD_BALANCER": {
+        "internetFacing": "true"
+      },
+      "LISTENER": {
+        "port": "80"
+      },
+      "TARGET_GROUP": {
+        "port": "8080",
+        "HealthCheck": {
+          "path": "/",
+          "interval": "1",
+          "healthyThresholdCount": "7",
+          "unhealthyThresholdCount": "7",
+          "healthyHttpCodes": "200-399"
+        }
+      },
+      "AUTO_SCALING_GROUP": {
+        "targetUtilizationPercent": "50",
+        "maxCapacity": "10",
+        "minCapacity": "1"
+      },
+      "RDS": {
+        "DatabaseInstanceEngineFullVersion": "12.5",
+        "DatabaseInstanceEngineMajorVersion": "12",
+        "InstanceClass": "t3",
+        "InstanceType": "small",
+        "databaseName": "camunda_db",
+        "username": "camunda"
+      }
     }
   }
 }
