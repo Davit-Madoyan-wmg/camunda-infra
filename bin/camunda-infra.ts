@@ -23,45 +23,72 @@ function getConfig() {
     let unparsedEnv = app.node.tryGetContext(env);
 
     const buildConfig: BuildConfig = {
+
         AWS_PROFILE_REGION: ensureString(unparsedEnv, 'AWS_PROFILE_REGION'),
         PROJECT: ensureString(unparsedEnv, 'PROJECT'),
         APP: ensureString(unparsedEnv, 'APP'),
         ENVIRONMENT: ensureString(unparsedEnv, 'ENVIRONMENT'),
+        VPC: {
+            cidr: unparsedEnv.cidr || "10.11.0.0/16",
+            enableDnsSupport: unparsedEnv.enableDnsSupport || "true",
+            natGateways: unparsedEnv.natGateways || "1",
+            enableDnsHostnames: unparsedEnv.enableDnsHostnames || "true",
+            maxAzs: unparsedEnv.maxAzs || "2",
+        },
+        POSTGRES_SG_ACCESS: {
+            allowAllOutbound: unparsedEnv.allowAllOutbound || "true",
+        },
+        POSTGRES_SG: {
+            allowAllOutbound: unparsedEnv.allowAllOutbound || "true",
+        },
+        FARGATE: {
+            memoryLimitMiB: unparsedEnv.memoryLimitMiB || "512",
+            cpu: unparsedEnv.cpu || "256",
+            image: unparsedEnv.image || "camunda/camunda-bpm-platform",
+            containerPort: unparsedEnv.containerPort || "8080",
+            logRetention: unparsedEnv.logRetention || "60",
+        },
+        ALB_SG: {
+            allowAllOutbound: unparsedEnv.allowAllOutbound || "true",
+            ingressPort: unparsedEnv.ingressPort || "80",
+        },
+        SERVICE_SG: {
+            allowAllOutbound: unparsedEnv.allowAllOutbound || "true",
+            ingressPort: unparsedEnv.ingressPort || "8080",
+        },
+        SERVICE: {
+            desiredCount: unparsedEnv.desiredCount || "1",
+        },
+        LOAD_BALANCER: {
+            internetFacing: unparsedEnv.internetFacing || "true",
+        },
+        LISTENER: {
+            port: unparsedEnv.port || "80",
+        },
+        TARGET_GROUP: {
+            port: unparsedEnv.port || "8080",
+            HealthCheck: {
+                path: unparsedEnv.path || "/",
+                interval: unparsedEnv.interval || "1",
+                healthyThresholdCount: unparsedEnv.healthyThresholdCount || "7",
+                unhealthyThresholdCount: unparsedEnv.unhealthyThresholdCount || "7",
+                healthyHttpCodes: unparsedEnv.healthyHttpCodes || "200-399",
+            }
+        },
+        AUTO_SCALING_GROUP: {
+            targetUtilizationPercent: unparsedEnv.targetUtilizationPercent || "50",
+            maxCapacity: unparsedEnv.maxCapacity || "10",
+            minCapacity: unparsedEnv.minCapacity || "1",
+        },
+        RDS: {
+            DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion || "12.5",
+            DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion || "12",
+            InstanceClass: unparsedEnv.InstanceClass || "t3",
+            InstanceType: unparsedEnv.instanceType || "small",
+            databaseName: unparsedEnv.databaseName || "camunda_db",
+            username: unparsedEnv.username || "camunda",
+        }
 
-        Cidr: unparsedEnv.Cidr || "10.11.0.0/16",
-        enableDnsSupport: unparsedEnv.enableDnsSupport || "true",
-        natGateways: unparsedEnv.natGateways || "1",
-        enableDnsHostnames: unparsedEnv.enableDnsHostnames || "true",
-        maxAzs: unparsedEnv.maxAzs || "2",
-        allowAllOutboundSGAccess: unparsedEnv.allowAllOutboundSGAccess || "true",
-        allowAllOutboundSG: unparsedEnv.allowAllOutboundSG || "true",
-        fargateMemoryLimitMiB: unparsedEnv.fargateMemoryLimitMiB || "512",
-        fargateCpu: unparsedEnv.fargateCpu || "256",
-        fargateImage: unparsedEnv.fargateImage || "camunda/camunda-bpm-platform",
-        fargateContainerPort: unparsedEnv.fargateContainerPort || "8080",
-        fargateLogRetention: unparsedEnv.fargateLogRetention || "60",
-        allowAllOutboundAlbSG: unparsedEnv.allowAllOutboundAlbSG || "true",
-        ingressPortAlbSG: unparsedEnv.ingressPortAlbSG || "80",
-        allowAllOutboundServiceSG: unparsedEnv.allowAllOutboundServiceSG || "true",
-        ingressPortServiceSG: unparsedEnv.ingressPortServiceSG || "8080",
-        desiredCountservice: unparsedEnv.desiredCountservice || "1",
-        internetFacinglb: unparsedEnv.internetFacinglb || "true",
-        portListener: unparsedEnv.portListener || "80",
-        portTargetGroup: unparsedEnv.portTargetGroup || "8080",
-        pathHealthCheck: unparsedEnv.pathHealthCheck || "/",
-        intervalHealthCheck: unparsedEnv.intervalHealthCheck || "1",
-        healthyThresholdCount: unparsedEnv.healthyThresholdCount || "7",
-        unhealthyThresholdCount: unparsedEnv.unhealthyThresholdCount || "7",
-        healthyHttpCodes: unparsedEnv.healthyHttpCodes || "200-399",
-        targetUtilizationPercent: unparsedEnv.targetUtilizationPercent || "50",
-        ASGmaxCapacity: unparsedEnv.ASGmaxCapacity || "10",
-        ASGminCapacity: unparsedEnv.ASGminCapacity || "1",
-        DatabaseInstanceEngineFullVersion: unparsedEnv.DatabaseInstanceEngineFullVersion || "12.5",
-        DatabaseInstanceEngineMajorVersion: unparsedEnv.DatabaseInstanceEngineMajorVersion || "12",
-        DbName: unparsedEnv.DbName || "camunda_db",
-        DbUser: unparsedEnv.DbUser || "camunda",
-        DbInstType: unparsedEnv.DbInstType || "small",
-        DbInstClass: unparsedEnv.DbInstClass || "t3"
     };
 
     return buildConfig;
