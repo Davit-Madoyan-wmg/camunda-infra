@@ -23,10 +23,10 @@ function getConfig() {
     let unparsedEnv = app.node.tryGetContext(env);
 
     const buildConfig: BuildConfig = {
-        AWSProfileRegion: ensureString(unparsedEnv, 'AWSProfileRegion'),
-        Project: ensureString(unparsedEnv, 'Project'),
-        App: ensureString(unparsedEnv, 'App'),
-        Environment: ensureString(unparsedEnv, 'Environment'),
+        AWS_PROFILE_REGION: ensureString(unparsedEnv, 'AWS_PROFILE_REGION'),
+        PROJECT: ensureString(unparsedEnv, 'PROJECT'),
+        APP: ensureString(unparsedEnv, 'APP'),
+        ENVIRONMENT: ensureString(unparsedEnv, 'ENVIRONMENT'),
 
         Cidr: unparsedEnv.Cidr || "10.11.0.0/16",
         enableDnsSupport: unparsedEnv.enableDnsSupport || "true",
@@ -77,11 +77,11 @@ const main = async () => {
     const callerIdentity = await stsClient.send(new GetCallerIdentityCommand({}));
 
 
-    Tags.of(app).add('Project', buildConfig.Project);
-    Tags.of(app).add('App', buildConfig.App);
-    Tags.of(app).add('Environment', buildConfig.Environment);
+    Tags.of(app).add('Project', buildConfig.PROJECT);
+    Tags.of(app).add('App', buildConfig.APP);
+    Tags.of(app).add('Environment', buildConfig.ENVIRONMENT);
 
-    let mainStackName = buildConfig.App + "-" + buildConfig.Environment + "-main";
+    let mainStackName = buildConfig.APP + "-" + buildConfig.ENVIRONMENT + "-main";
     const mainStack = new CamundaInfraStack(
         app,
         mainStackName,
@@ -92,7 +92,7 @@ const main = async () => {
         },
         {
             env: {
-                region: buildConfig.AWSProfileRegion
+                region: buildConfig.AWS_PROFILE_REGION
             }
         });
 }
