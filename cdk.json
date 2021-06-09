@@ -68,7 +68,7 @@
       "DbUser": "camunda"
     },
     "prod": {
-      "AWSProfileRegion" : "us-east-2",
+      "AWSProfileRegion" : "us-east-1",
 
       "Project": "carpathia",
       "App": "camunda",
