@@ -79,7 +79,7 @@
       }
     },
     "prod": {
-      "AWS_PROFILE_REGION": "us-east-2",
+      "AWS_PROFILE_REGION": "us-east-1",
       "PROJECT": "carpathia",
       "APP": "camunda",
       "ENVIRONMENT": "prod",
