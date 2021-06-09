@@ -17,31 +17,35 @@ export class CamundaInfraStack extends cdk.Stack {
 
     const appFullName = `${buildConfig.Project}-${buildConfig.App}-${buildConfig.Environment}`
 
-    const vpc = new ec2.Vpc(this, 'camundaVPC', {
-      cidr: buildConfig.Cidr,
-      enableDnsSupport: convertStringToBool(buildConfig.enableDnsSupport),
-      natGateways: +buildConfig.natGateways,
-      enableDnsHostnames: convertStringToBool(buildConfig.enableDnsHostnames),
-      maxAzs: +buildConfig.maxAzs,
-      subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: 'public',
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: 'private',
-          subnetType: ec2.SubnetType.PRIVATE,
-        },
-        {
-          cidrMask: 24,
-          name: 'db',
-          subnetType: ec2.SubnetType.ISOLATED,
-        }
-     ]
+    // const vpc = new ec2.Vpc(this, 'camundaVPC', {
+    //   cidr: buildConfig.Cidr,
+    //   enableDnsSupport: convertStringToBool(buildConfig.enableDnsSupport),
+    //   natGateways: +buildConfig.natGateways,
+    //   enableDnsHostnames: convertStringToBool(buildConfig.enableDnsHostnames),
+    //   maxAzs: +buildConfig.maxAzs,
+    //   subnetConfiguration: [
+    //     {
+    //       cidrMask: 24,
+    //       name: 'public',
+    //       subnetType: ec2.SubnetType.PUBLIC,
+    //     },
+    //     {
+    //       cidrMask: 24,
+    //       name: 'private',
+    //       subnetType: ec2.SubnetType.PRIVATE,
+    //     },
+    //     {
+    //       cidrMask: 24,
+    //       name: 'db',
+    //       subnetType: ec2.SubnetType.ISOLATED,
+    //     }
+    //  ]
+    // })
+    // Tags.of(vpc).add("Name",`${appFullName}-vpc`)
+
+    const vpc = ec2.Vpc.fromLookup(this, id = "VPC", {
+      vpcName: 'wmg-carpathia-nonprod-ue1-vpc'
     })
-    Tags.of(vpc).add("Name",`${appFullName}-vpc`)
 
     // Create an ECS cluster
     const cluster = new ecs.Cluster(this, 'camundaCluster', {
@@ -82,7 +86,7 @@ export class CamundaInfraStack extends cdk.Stack {
       }),
       instanceType: new ec2.InstanceType(`${buildConfig.DbInstClass}.${buildConfig.DbInstType}`),
       vpc: vpc,
-      vpcSubnets: {subnetType: ec2.SubnetType.ISOLATED},
+      vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},
       databaseName: buildConfig.DbName,
       credentials: rds.Credentials.fromSecret(secret),
       securityGroups: [postgresSG],
