@@ -59,18 +59,18 @@ export class CamundaInfraStack extends cdk.Stack {
             vpcName: 'wmg-carpathia-nonprod-ue1-vpc'
         })
 
-        // Bucket setup for web distribution bucket
-        const {bucketList: {Buckets = []}, callerIdentity} = runtimeProps;
-        const bucketId = `web-distribution-bucket-${ENVIRONMENT}`;
-        const bucketName = `carpathia-wmg-${bucketId}-${callerIdentity.Account}`;
+        // // // Bucket setup for web distribution bucket
+        // // const {bucketList: {Buckets = []}, callerIdentity} = runtimeProps;
+        // // const bucketId = `web-distribution-bucket-${ENVIRONMENT}`;
+        // // const bucketName = `carpathia-wmg-${bucketId}-${callerIdentity.Account}`;
 
-        const webDistributionBucket = Buckets.some((b: any) => b.Name === bucketName) ?
-            Bucket.fromBucketName(this, bucketId, bucketName) :
-            new Bucket(this, bucketId, {
-                bucketName,
-                publicReadAccess: true,
-                websiteIndexDocument: 'index.html',
-            });
+        // // const webDistributionBucket = Buckets.some((b: any) => b.Name === bucketName) ?
+        // //     Bucket.fromBucketName(this, bucketId, bucketName) :
+        // //     new Bucket(this, bucketId, {
+        // //         bucketName,
+        // //         publicReadAccess: true,
+        // //         websiteIndexDocument: 'index.html',
+        // //     });
 
         // Lambda@Edge
         /* -- This option is only needed if the stack is not deployed in us-east-1
@@ -81,41 +81,41 @@ export class CamundaInfraStack extends cdk.Stack {
           handler: 'cloudfront-edge.handler',
         });
         */
-        const lambdaCloudfrontEdge = new NodejsFunction(this, 'lambda-edge', {
-            entry: "src/lambda/cloudfront-edge.ts",
-            // environment: {
-            //   BUCKET_WEBSITE_ENDPOINT: webDistributionBucket.bucketWebsiteDomainName,
-            // }
-        });
+        // // const lambdaCloudfrontEdge = new NodejsFunction(this, 'lambda-edge', {
+        // //     entry: "src/lambda/cloudfront-edge.ts",
+        // //     // environment: {
+        // //     //   BUCKET_WEBSITE_ENDPOINT: webDistributionBucket.bucketWebsiteDomainName,
+        // //     // }
+        // // });
 
-        const domainName = 'dev.wmg.clients.productlab.dev';
+        // // const domainName = 'dev.wmg.clients.productlab.dev';
 
-        // Certificate
-        const certificate = new acm.Certificate(this, 'ssl-certificate', {
-            domainName,
-        });
+        // // // Certificate
+        // // const certificate = new acm.Certificate(this, 'ssl-certificate', {
+        // //     domainName,
+        // // });
 
-        // Route53 Hosted Zone
-        const r53HostedZone = new r53.HostedZone(this, 'r53-hosted-zone', {
-            zoneName: domainName,
-        });
+        // // // Route53 Hosted Zone
+        // // const r53HostedZone = new r53.HostedZone(this, 'r53-hosted-zone', {
+        // //     zoneName: domainName,
+        // // });
 
 
-        // Cloudfront Distribution
-        const cloudfrontDistributionId = `cloudfront-web-distribution-${ENVIRONMENT}`;
-        const cloudfrontDistribution = new CloudfrontDistribution(this, cloudfrontDistributionId, {
-            defaultBehavior: {
-                origin: new S3Origin(webDistributionBucket),
-                edgeLambdas: [
-                    {
-                        functionVersion: lambdaCloudfrontEdge.currentVersion,
-                        eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
-                    }
-                ]
-            },
-            certificate,
-            domainNames: [domainName]
-        });
+        // // // Cloudfront Distribution
+        // // const cloudfrontDistributionId = `cloudfront-web-distribution-${ENVIRONMENT}`;
+        // // const cloudfrontDistribution = new CloudfrontDistribution(this, cloudfrontDistributionId, {
+        // //     defaultBehavior: {
+        // //         origin: new S3Origin(webDistributionBucket),
+        // //         edgeLambdas: [
+        // //             {
+        // //                 functionVersion: lambdaCloudfrontEdge.currentVersion,
+        // //                 eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
+        // //             }
+        // //         ]
+        // //     },
+        // //     certificate,
+        // //     domainNames: [domainName]
+        // // });
 
         // Database Cluster
         // const postgres = new rds.DatabaseCluster(this, 'postgres-cluster', {
@@ -131,19 +131,19 @@ export class CamundaInfraStack extends cdk.Stack {
         // });
         // postgres.connections.allowFromAnyIpv4(ec2.Port.allTcp());
 
-        // SSM Params
-        new StringParameter(this, `ssm-${bucketId}`, {
-            parameterName: 'web-distribution-bucket-name',
-            stringValue: bucketName,
-        });
-        new StringParameter(this, `ssm-cloudfront-domain-name`, {
-            parameterName: 'cloudfront-distribution-domain-name',
-            stringValue: cloudfrontDistribution.distributionDomainName,
-        });
-        // new StringParameter(this, 'ssm-postgres-creds-secret-arn', {
-        //     parameterName: 'postgres-master-password-secret-arn',
-        //     stringValue: postgres.secret!.secretArn,
-        // })
+        // // // SSM Params
+        // // new StringParameter(this, `ssm-${bucketId}`, {
+        // //     parameterName: 'web-distribution-bucket-name',
+        // //     stringValue: bucketName,
+        // // });
+        // // new StringParameter(this, `ssm-cloudfront-domain-name`, {
+        // //     parameterName: 'cloudfront-distribution-domain-name',
+        // //     stringValue: cloudfrontDistribution.distributionDomainName,
+        // // });
+        // // // new StringParameter(this, 'ssm-postgres-creds-secret-arn', {
+        // // //     parameterName: 'postgres-master-password-secret-arn',
+        // // //     stringValue: postgres.secret!.secretArn,
+        // // // })
 
         // Create an ECS cluster
         const cluster = new ecs.Cluster(this, 'camundaCluster', {
