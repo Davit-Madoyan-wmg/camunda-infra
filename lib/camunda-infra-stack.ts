@@ -5,13 +5,13 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as rds from '@aws-cdk/aws-rds';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import {BuildConfig, RuntimeProps} from "../config/build-config";
-import {Bucket} from '@aws-cdk/aws-s3';
-import {Distribution as CloudfrontDistribution, LambdaEdgeEventType} from '@aws-cdk/aws-cloudfront';
-import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
-import {StringParameter} from '@aws-cdk/aws-ssm';
-import {S3Origin} from '@aws-cdk/aws-cloudfront-origins';
-import * as r53 from '@aws-cdk/aws-route53';
-import * as acm from '@aws-cdk/aws-certificatemanager';
+// import {Bucket} from '@aws-cdk/aws-s3';
+// import {Distribution as CloudfrontDistribution, LambdaEdgeEventType} from '@aws-cdk/aws-cloudfront';
+// import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
+// import {StringParameter} from '@aws-cdk/aws-ssm';
+// import {S3Origin} from '@aws-cdk/aws-cloudfront-origins';
+// import * as r53 from '@aws-cdk/aws-route53';
+// import * as acm from '@aws-cdk/aws-certificatemanager';
 
 export class CamundaInfraStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, buildConfig: BuildConfig, runtimeProps: RuntimeProps, props?: cdk.StackProps) {
@@ -251,7 +251,7 @@ export class CamundaInfraStack extends cdk.Stack {
         // Create ALB
         const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
             vpc,
-            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},  // needs to be chnaged to PUBLIC
+            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE, onePerAz: true},   // needs to be chnaged to PUBLIC
             internetFacing: convertStringToBool(LOAD_BALANCER.internetFacing),
             securityGroup: AlbSG,
             loadBalancerName: `${appFullName}-lb`
