@@ -14,8 +14,8 @@
     "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
     "dev": {
       "AWS_PROFILE_REGION": "us-east-1",
-      "ACCOUNT": "006348584023",
-      "PROJECT": "carpathia",
+      "ACCOUNT": "713291583775",
+      "PROJECT": "wmg-carpathia",
       "APP": "camunda",
       "ENVIRONMENT": "dev",
       "VPC": {
@@ -50,7 +50,7 @@
         "desiredCount": "1"
       },
       "LOAD_BALANCER": {
-        "internetFacing": "true"
+        "internetFacing": "false"
       },
       "LISTENER": {
         "port": "80"
@@ -80,13 +80,13 @@
       }
     },
     "prod": {
-      "AWS_PROFILE_REGION": "us-east-1",
+      "AWS_PROFILE_REGION": "us-east-2",
       "ACCOUNT": "713291583775",
       "PROJECT": "carpathia",
       "APP": "camunda",
       "ENVIRONMENT": "prod",
       "VPC": {
-        "cidr": "10.11.0.0/16",
+        "cidr": "10.12.0.0/16",
         "enableDnsSupport": "true",
         "natGateways": "1",
         "enableDnsHostnames": "true",
@@ -117,7 +117,7 @@
         "desiredCount": "1"
       },
       "LOAD_BALANCER": {
-        "internetFacing": "false"
+        "internetFacing": "true"
       },
       "LISTENER": {
         "port": "80"

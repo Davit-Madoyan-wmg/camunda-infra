@@ -1,11 +1,3 @@
-import {ListBucketsCommandOutput} from "@aws-sdk/client-s3";
-import {GetCallerIdentityCommandOutput} from "@aws-sdk/client-sts";
-
-export interface RuntimeProps {
-    bucketList: ListBucketsCommandOutput;
-    callerIdentity: GetCallerIdentityCommandOutput;
-}
-
 export interface BuildConfig {
     readonly AWS_PROFILE_REGION: string;
     readonly ACCOUNT: string;

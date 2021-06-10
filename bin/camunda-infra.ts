@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 import {Tags} from '@aws-cdk/core';
-import {CamundaInfraStack} from '../lib/camunda-infra-stack';
+import {CarpathiaCamundaStack} from '../lib/camunda-infra-stack';
 import {BuildConfig} from "../config/build-config";
-import {ListBucketsCommand, S3Client} from '@aws-sdk/client-s3';
-import {GetCallerIdentityCommand, STSClient} from '@aws-sdk/client-sts';
 import cdk = require('@aws-cdk/core');
 
 const app = new cdk.App();
@@ -98,33 +96,22 @@ function getConfig() {
 const main = async () => {
     let buildConfig: BuildConfig = getConfig();
 
-    const s3Client = new S3Client({region: 'us-east-1'});
-    const stsClient = new STSClient({region: 'us-east-1'});
-
-    const bucketList = await s3Client.send(new ListBucketsCommand({}));
-    const callerIdentity = await stsClient.send(new GetCallerIdentityCommand({}));
-
-
     Tags.of(app).add('Project', buildConfig.PROJECT);
     Tags.of(app).add('App', buildConfig.APP);
     Tags.of(app).add('Environment', buildConfig.ENVIRONMENT);
 
-    let mainStackName = buildConfig.APP + "-" + buildConfig.ENVIRONMENT + "-main";
-    const mainStack = new CamundaInfraStack(
+    let mainStackName = buildConfig.PROJECT + "-" + buildConfig.APP + "-" + buildConfig.ENVIRONMENT;
+    const mainStack = new CarpathiaCamundaStack(
         app,
         mainStackName,
         buildConfig,
-        {
-            bucketList,
-            callerIdentity
-        },
         {
             env: {
                 region: buildConfig.AWS_PROFILE_REGION,
                 account: buildConfig.ACCOUNT
             }
         }
-    );
+    )
 }
 
 main();
