@@ -1,37 +1,55 @@
 {
   "vpc-provider:account=713291583775:filter.tag:Name=wmg-carpathia-nonprod-ue1-vpc:region=us-east-1:returnAsymmetricSubnets=true": {
-    "vpcId": "vpc-0e1727a04f8f6ce3c",
+    "vpcId": "vpc-088ae70dae8348874",
     "vpcCidrBlock": "10.28.80.0/24",
     "availabilityZones": [],
-    "vpnGatewayId": "vgw-069b60f148e6a9fab",
+    "vpnGatewayId": "vgw-0d0e72cb486630e96",
     "subnetGroups": [
-      {
-        "name": "Public",
-        "type": "Public",
-        "subnets": [
-          {
-            "subnetId": "subnet-0922f122c45c77ddd",
-            "cidr": "10.28.80.0/26",
-            "availabilityZone": "us-east-1b",
-            "routeTableId": "rtb-0252be90b791abaaa"
-          }
-        ]
-      },
       {
         "name": "Private",
         "type": "Private",
         "subnets": [
           {
-            "subnetId": "subnet-02dbfd8a337ccce19",
-            "cidr": "10.28.80.64/26",
+            "subnetId": "subnet-078eb18c7a640e4c9",
+            "cidr": "10.28.80.64/27",
             "availabilityZone": "us-east-1b",
-            "routeTableId": "rtb-0906f5a53bcae087b"
+            "routeTableId": "rtb-01e6fe76bf89a1a03"
           },
           {
-            "subnetId": "subnet-09701e0f32de70c89",
-            "cidr": "10.28.80.128/26",
+            "subnetId": "subnet-0cc1b3eb2c714ce2a",
+            "cidr": "10.28.80.128/27",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0152386297113df3b"
+          },
+          {
+            "subnetId": "subnet-0acefd6ba8a67440f",
+            "cidr": "10.28.80.0/27",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0fea1f0172d71601c"
+          },
+          {
+            "subnetId": "subnet-08b21691f76d17613",
+            "cidr": "10.28.80.160/27",
             "availabilityZone": "us-east-1c",
-            "routeTableId": "rtb-018b83b257ba1c60a"
+            "routeTableId": "rtb-0211a416d0f3369c8"
+          },
+          {
+            "subnetId": "subnet-0733932aa53bf3a59",
+            "cidr": "10.28.80.96/27",
+            "availabilityZone": "us-east-1c",
+            "routeTableId": "rtb-08d54981ec21e2474"
+          }
+        ]
+      },
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-005bbd54a34a0cb3e",
+            "cidr": "10.28.80.32/27",
+            "availabilityZone": "us-east-1c",
+            "routeTableId": "rtb-027490d28d055c6b3"
           }
         ]
       }
