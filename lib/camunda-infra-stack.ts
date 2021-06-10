@@ -157,10 +157,12 @@ export class CarpathiaCamundaStack extends cdk.Stack {
         });
         Tags.of(service).add("Name", `${appFullName}-service`)
 
+        console.log(`internetFacing: ${LOAD_BALANCER.internetFacing}`)
+
         // Create ALB
         const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
             vpc,
-            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE, onePerAz: true},   // needs to be chnaged to PUBLIC
+            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE, onePerAz: true},   // needs to be changed to PUBLIC
             internetFacing: convertStringToBool(LOAD_BALANCER.internetFacing),
             securityGroup: AlbSG,
             loadBalancerName: `${appFullName}-lb`
