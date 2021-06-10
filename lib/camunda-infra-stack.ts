@@ -251,6 +251,7 @@ export class CamundaInfraStack extends cdk.Stack {
         // Create ALB
         const lb = new elbv2.ApplicationLoadBalancer(this, 'camundaLB', {
             vpc,
+            vpcSubnets: {subnetType: ec2.SubnetType.PRIVATE},  // needs to be chnaged to PUBLIC
             internetFacing: convertStringToBool(LOAD_BALANCER.internetFacing),
             securityGroup: AlbSG,
             loadBalancerName: `${appFullName}-lb`
