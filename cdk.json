@@ -117,7 +117,7 @@
         "desiredCount": "1"
       },
       "LOAD_BALANCER": {
-        "internetFacing": "true"
+        "internetFacing": "false"
       },
       "LISTENER": {
         "port": "80"
